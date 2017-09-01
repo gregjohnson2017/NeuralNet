@@ -23,7 +23,7 @@ vector<double> add(vector<double> a, vector<double> b){
 	if(a.size() != b.size()){
 		throw invalid_argument("cannot add vectors of different sizes");
 	}
-	for(int i = 0; i < a.size(); i++){
+	for(int i = 0; i < (int)a.size(); i++){
 		c.push_back(a[i] + b[i]);
 	}
 	return c;
@@ -37,7 +37,7 @@ vector<double> subtract(vector<double> a, vector<double> b){
 	if(a.size() != b.size()){
 		throw invalid_argument("cannot subtract vectors of different sizes");
 	}
-	for(int i = 0; i < a.size(); i++){
+	for(int i = 0; i < (int)a.size(); i++){
 		c.push_back(a[i] - b[i]);
 	}
 	return c;

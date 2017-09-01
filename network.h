@@ -5,11 +5,14 @@
 using namespace std;
 class Network{
 	public:
-		int nLayers, nInput, nOutput;
+		static double trainingConstant(){
+			return 1;
+		}
+		int nLayers, nInputs, nOutputs;
 		vector<Layer*> layers;
-		Network::vector<double> getOutputs(vector<double> inputs){
+		vector<double> getOutputs(vector<double> inputs);
 		void train(vector<double> inputs, vector<double> answers);
-		Network(int nLayers, int nInput, int nOutput);
+		Network(int nLayers, int nInputs, int nOutputs);
 		~Network();
 };
 #endif

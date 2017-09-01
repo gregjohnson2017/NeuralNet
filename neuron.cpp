@@ -13,7 +13,7 @@ Neuron constructor: assigns random weights (-1 to 1 non-inclusive),
 that should correspond the number of inputs from the previous layer.
 Each neuron also gets a random bias (-1 to 1 non-inclusive).
 */
-Neuron::Neuron(int nWeights) : trainingConstant(1){
+Neuron::Neuron(int nWeights){
 	bias = rand() * 2 - 1; // -1 to 1 non-inclusive
 	for(int i = 0; i < nWeights; i++){
 		weights.push_back(rand() * 2 - 1); // -1 to 1 non-inclusive
@@ -33,7 +33,7 @@ Returns the sigmoid function of this sum.
 double Neuron::feed(vector<double> inputs){
 	if(inputs.size() != weights.size()) throw std::invalid_argument("mismatched inputs and weights");
 	double sum = 0;
-	for(int i = 0; i < weights.size(); i++){
+	for(int i = 0; i < (int)weights.size(); i++){
 		sum += inputs[i] * weights[i] - bias;
 	}
 	return sigmoid(sum);
