@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "neuron.h"
+#include "layer.h"
 #include <stdio.h>
 #include <time.h>
 

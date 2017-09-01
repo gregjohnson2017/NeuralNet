@@ -1,14 +1,18 @@
 #include "neuron.h"
+#include "layer.h"
 
-class Layer{
-	public:
-		Neuron neurons[];
-		int nNeurons;
-		Layer(int nNeurons, int nInputs){
-			this->nNeurons = nNeurons;
-			neurons = new Neuron[nNeurons];
-			for(int i = 0; i < nNeurons; i++){
-				neurons[i] = new Neuron(nInputs);
-			}
-		}
+/*
+Layer constructor, builds a layer of nNeurons neurons.
+Each neuron will be initialized with nInputs weights.
+*/
+Layer::Layer(int nNeurons, int nInputs){
+	this->nNeurons = nNeurons;
+	for(int i = 0; i < neurons.size(); i++){
+		neurons.push_back(new Neuron(nInputs));
+	}
 }
+
+Layer::~Layer(){
+	neurons.clear();
+}
+

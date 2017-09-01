@@ -23,7 +23,7 @@ Neuron::Neuron(int nWeights) : trainingConstant(1){
 }
 /*
 Neuron destructor method.
-*/
+*/	
 Neuron::~Neuron(){
 	if (weights)
 		delete[] weights;
