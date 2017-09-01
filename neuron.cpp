@@ -7,13 +7,13 @@ Using lessons from http://natureofcode.com/book/chapter-10-neural-networks/
 
 class Neuron{
 	public:
-		double *weights, bias;
+		double weights[], bias;
 		int nWeights;
 		const double trainingConstant = 1;
 		
 		Neuron(int nWeights){
 			this->nWeights = nWeights;
-			weights = malloc(sizeof(double) * nWeights);
+			weights = new double[nWeights];
 			bias = rand() * 2 - 1; // -1 to 1 non-inclusive
 			for(int i = 0; i < nWeights; i++){
 				weights[i] = rand() * 2 - 1; // -1 to 1 non-inclusive
@@ -21,10 +21,10 @@ class Neuron{
 		}
 		
 		~Neuron(){
-			free(weights);
+			delete[] weights;
 		}
 		
-		int feedforward(double *inputs, nInputs){
+		double feed(double inputs[], nInputs){
 			if(nInputs != nWeights) throw std::invalid_argument("mismatched inputs and weights");
 			double sum = 0;
 			for(int i = 0; i < nWeights; i++){
