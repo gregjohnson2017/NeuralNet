@@ -35,7 +35,7 @@ Network::~Network(){
 Completes one pass through the network, returning the outputs of the neurons
 in the final layer.
 */
-vector<double> Network::getOutputs(vector<double> inputs){
+vector<double> Network::getOutputs(vector<double> &inputs){
 	vector<double> results = inputs;
 	for(int i = 0; i < nLayers; i++){
 		results = layers[i]->feedLayer(results);
@@ -48,7 +48,7 @@ This will train all the neurons in the network by calculating their error
 from a known answer, and modifying their weights respetively.
 In every layer, each neuron gets all the inputs from the previous layer.
 */	
-void Network::train(vector<double> guesses, vector<double> answers){
+void Network::train(vector<double> &guesses, vector<double> &answers){
 	if(guesses.size() != answers.size()) throw invalid_argument("mismatched guesses and answers");
 	vector<double> error = subtract(answers, guesses);
 	for(int i = 0; i < (int)layers.size(); i++){

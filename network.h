@@ -10,8 +10,8 @@ class Network{
 		}
 		int nLayers, nInputs, nOutputs;
 		vector<Layer*> layers;
-		vector<double> getOutputs(vector<double> inputs);
-		void train(vector<double> inputs, vector<double> answers);
+		vector<double> getOutputs(vector<double> &inputs);
+		void train(vector<double> &inputs, vector<double> &answers);
 		Network(int nLayers, int nInputs, int nOutputs);
 		~Network();
 };

@@ -30,7 +30,7 @@ Determines the neuron's output (-1 to 1 non-inclusive).
 Sums the products of all inputs and their respective weights minus bias.
 Returns the sigmoid function of this sum.
 */
-double Neuron::feed(vector<double> inputs){
+double Neuron::feed(vector<double> &inputs){
 	if(inputs.size() != weights.size()) throw std::invalid_argument("mismatched inputs and weights");
 	double sum = 0;
 	for(int i = 0; i < (int)weights.size(); i++){

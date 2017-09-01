@@ -8,6 +8,6 @@ class Neuron {
 		vector<double> weights;
 		Neuron (int);
 		~Neuron();
-		double feed(vector<double>);
+		double feed(vector<double> &);
 };
 #endif

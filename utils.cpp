@@ -18,7 +18,7 @@ double sigmoid(double x){
 /*
 Returns a new vector of a + b
 */
-vector<double> add(vector<double> a, vector<double> b){
+vector<double> add(const vector<double> &a, const vector<double> &b){
 	vector<double> c;
 	if(a.size() != b.size()){
 		throw invalid_argument("cannot add vectors of different sizes");
@@ -32,7 +32,7 @@ vector<double> add(vector<double> a, vector<double> b){
 /*
 Returns a new vector of a - b
 */
-vector<double> subtract(vector<double> a, vector<double> b){
+vector<double> subtract(const vector<double> &a, const vector<double> &b){
 	vector<double> c;
 	if(a.size() != b.size()){
 		throw invalid_argument("cannot subtract vectors of different sizes");

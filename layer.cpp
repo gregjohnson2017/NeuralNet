@@ -16,7 +16,7 @@ Layer::Layer(int nNeurons, int nInputs){
 /*
 Adds each neuron's output to the layer's result vector, and returns this result vector.
 */
-vector<double> Layer::feedLayer(vector<double> inputs){
+vector<double> Layer::feedLayer(vector<double> &inputs){
 	for(int i = 0; i < (int)neurons.size(); i++){
 		outputs.push_back(neurons[i]->feed(inputs));
 	}
