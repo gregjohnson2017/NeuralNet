@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include <stdlib.h>
+#include <stdexcept>
 #include <math.h>
 // Returns an int between min and max, inclusive.
 int getRandom(int min, int max);
