@@ -6,7 +6,8 @@ using namespace std;
 class Layer{
 	public:
 		vector<Neuron*> neurons;
-		int nNeurons;
+		int nNeurons, nInputs;
+		vector<double> feedLayer(vector<double> inputs), outputs;
 		Layer(int nNeurons, int nInputs);
 		~Layer();
 };

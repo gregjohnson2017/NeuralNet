@@ -1,9 +1,44 @@
 #include "utils.h"
+#include <vector>
+
+using namespace std;
 
 int getRandom(int min, int max){
 	return rand() % (max - min + 1) + min;
 }
 
-double sigmoid(double sum){
-	return 1 / (1 + exp(-1 * sum));
+/*
+Returns the calculated sigmoid value 1/(1+e^-x)
+Range is -1 to 1 non-inclusive
+*/
+double sigmoid(double x){
+	return 1 / (1 + exp(-1 * x));
+}
+
+/*
+Returns a new vector of a + b
+*/
+vector<double> add(vector<double> a, vector<double> b){
+	vector<double> c;
+	if(a.size() != b.size()){
+		throw invalid_argument("cannot add vectors of different sizes");
+	}
+	for(int i = 0; i < a.size(); i++){
+		c.push_back(a[i] + b[i]);
+	}
+	return c;
+}
+
+/*
+Returns a new vector of a - b
+*/
+vector<double> subtract(vector<double> a, vector<double> b){
+	vector<double> c;
+	if(a.size() != b.size()){
+		throw invalid_argument("cannot subtract vectors of different sizes");
+	}
+	for(int i = 0; i < a.size(); i++){
+		c.push_back(a[i] - b[i]);
+	}
+	return c;
 }
