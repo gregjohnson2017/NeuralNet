@@ -1,8 +1,9 @@
-# Compiled runnable file #
+# Custom #
 ##########################
 net
 makefile
 Makefile
+*.swp
 
 # Compiled source #
 ###################
