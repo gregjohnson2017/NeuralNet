@@ -7,6 +7,6 @@ class Neuron {
 
 		Neuron (int);
 		~Neuron();
-		double feed(double *, int);
-		void train(double *, int, int);
+		double feed(double[], int);
+		void train(double[], int, int);
 };
