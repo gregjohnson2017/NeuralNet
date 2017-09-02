@@ -15,6 +15,11 @@ double sigmoid(double x){
 	return 1 / (1 + exp(-1 * x));
 }
 
+
+double sigmoid_prime(double x){
+	return sigmoid(x) * (1 - sigmoid(x));
+}
+
 /*
 Returns a new vector of a + b
 */
