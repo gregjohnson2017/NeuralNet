@@ -61,5 +61,6 @@ void Network::train(vector<double> &guesses, vector<double> &answers){
 	}
 }
 
-
-
+void backPropagate(vector<double> &weights, vector<double> &error, vector<double> &z){
+	return;
+}
