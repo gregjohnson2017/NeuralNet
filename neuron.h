@@ -8,9 +8,7 @@ class Neuron {
 		Neuron(int);
 		Neuron(vector<double> &weights, double bias);
 		~Neuron();
-		double bias;
-		double error;
-		double z;
-		double feed(vector<double> &);
+		double bias, error, z, a;
+		void feed(vector<double> &);
 };
 #endif

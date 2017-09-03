@@ -7,7 +7,9 @@ class Layer{
 	public:
 		vector<Neuron> neurons;
 		int nNeurons;
-		vector<double> feedLayer(vector<double> &inputs), outputs;
+		void feedLayer(vector<double> &inputs);
+		vector<double> getOutputs();
+		vector<double> outputs;
 		Layer(int nNeurons, int nInputs);
 		Layer(vector<Neuron> &neurons);
 		~Layer();

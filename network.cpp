@@ -46,19 +46,30 @@ Network::~Network(){
 Completes one pass through the network, returning the outputs of the neurons
 in the final layer.
 */
-vector<double> Network::getOutputs(vector<double> &inputs){
-	vector<double> results = inputs;
+void Network::feedNetwork(vector<double> &inputs){
 	for(int i = 0; i < nLayers; i++){
-		results = layers[i].feedLayer(results);
+		vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
+		for(int j = 0; j < (int)layers[i].neurons.size(); j++){
+			layers[i].neurons[j].feed(inputs);
+		}
+		layerInputs.clear();
 	}
-	return results;
 }
-	
+
+vector<double> Network::getOutputs(){
+	vector<double> outputs;
+	for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
+		outputs.push_back(layers[layers.size() - 1].neurons[i].a);
+	}
+	return outputs;
+}
+
 /*
 FIX ME !!!!!!!!!!!
 */	
 void Network::train(samples *s){
-
+	
+	
 	// train a network with an entire set of data
 	// s->inputData is all of the input data in a 1d array
 	// s->answers are the answers per s->sampleSize section of s->inputData  
@@ -74,6 +85,14 @@ void Network::train(samples *s){
 	}*/
 }
 
+void Network::computeOutputError(double answer){
+	for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
+		double y = i - 1 == answer ? 1 : 0;
+		Neuron n = layers[layers.size() - 1].neurons[i];
+		n.error = (n.a - y) * sigmoid_prime(n.z);
+	}
+}
+
 /*
 Calculates and updates the errors of the neurons
 */
@@ -84,9 +103,9 @@ void Network::backPropagate(){
 		for(int j = 0; j < layers[l].nNeurons; j++){
 			double sum = 0;
 			// loop through neurons k in layer l+1
-			for(int k = 0; k < layers[l+1].nNeurons; k++){
-				double w = layers[l+1].neurons[k].weights[j];
-				double e = layers[l+1].neurons[k].error;
+			for(int k = 0; k < layers[l + 1].nNeurons; k++){
+				double w = layers[l + 1].neurons[k].weights[j];
+				double e = layers[l + 1].neurons[k].error;
 				double z = layers[l].neurons[j].z;
 				sum += w * e * sigmoid_prime(z);
 				// set error for the neuron to sum

@@ -34,13 +34,16 @@ int main(int argc, char **argv){
 samples* getSamples(char *fileName){
 	data_collection *d = read_data(fileName);
 	samples *s = (samples*)malloc(sizeof(samples));
-	vector<double> data, answers;
+	vector<vector<double>> data;
+	vector<double> answers;
 	for(int i = 0; i < d->num_arrays; i++){
+		vector<double> sample;
 		for(int j = 0; j < d->size; j++){
 			for(int k = 0; k < d->size; k++){
-				data.push_back((double)d->data[i][j][k]);
+				sample.push_back((double)d->data[i][j][k]);
 			}
 		}
+		data.push_back(sample);
 		answers.push_back((double)d->answers[i]);
 	}
 	s->inputData = data;

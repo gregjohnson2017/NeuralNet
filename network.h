@@ -6,7 +6,8 @@
 using namespace std;
 
 typedef struct samples{
-	vector<double> inputData, answers;
+	vector<vector<double>> inputData;
+	vector<double> answers;
 	int sampleSize; // length of 1d array stretch before next sample
 	// ex 64x64 image: sampleSize = 4096
 } samples;
@@ -21,11 +22,13 @@ class Network{
 			return 1;
 		}
 		vector<Layer> layers;
-		vector<double> getOutputs(vector<double> &inputs);
+		vector<double> getOutputs();
 		void train(samples *s);
+		void feedNetwork(vector<double> &inputs);
+		void backPropagate();
+		void computeOutputError(double answer);
 		void saveNetwork(char *fileName);
 		Network* loadNetwork(char *fileName);
-		void backPropagate();
 };
 #endif
 
