@@ -9,7 +9,7 @@ Acknowledgements: http://natureofcode.com/book/chapter-10-neural-networks/
 */
 
 /*
-Neuron constructor: assigns random weights (-1 to 1 non-inclusive),
+Random Neuron constructor: assigns random weights (-1 to 1 non-inclusive),
 that should correspond the number of inputs from the previous layer.
 Each neuron also gets a random bias (-1 to 1 non-inclusive).
 */
@@ -19,6 +19,16 @@ Neuron::Neuron(int nWeights){
 		weights.push_back(rand() * 2 - 1); // -1 to 1 non-inclusive
 	}
 }
+
+/*
+Neuron constructor for pre-defined weights and bias.
+Used for loading networks
+*/
+Neuron::Neuron(vector<double> &weights, double bias){
+	this->weights = weights;
+	this->bias = bias;
+}
+
 /*
 Neuron destructor method.
 */	
