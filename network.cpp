@@ -65,7 +65,7 @@ vector<double> Network::getOutputs(){
 }
 
 /*
-FIX ME !!!!!!!!!!!
+FIX ME !!!!!!!!!!! cause I am borked
 */	
 void Network::train(samples *s){
 	

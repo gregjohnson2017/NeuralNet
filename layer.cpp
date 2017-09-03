@@ -7,7 +7,7 @@ Each neuron will be initialized randomly with nInputs weights and a bias.
 */
 Layer::Layer(int nNeurons, int nInputs){
 	this->nNeurons = nNeurons;
-	for(int i = 0; i < (int)neurons.size(); i++){
+	for(int i = 0; i < nNeurons; i++){
 		neurons.push_back(Neuron(nInputs));
 	}
 }

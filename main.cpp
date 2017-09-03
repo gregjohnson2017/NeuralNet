@@ -26,6 +26,9 @@ int main(int argc, char **argv){
 	char *networkFile = (char*)malloc(sizeof(char) * 11);
 	memcpy(networkFile, "network.nn\0", 11);
 	n->saveNetwork(networkFile);
+	delete s->inputData;
+	delete s->answers;
+	free(s);
 	free(dataFile);
 	free(networkFile);
 	return 1;
@@ -34,8 +37,8 @@ int main(int argc, char **argv){
 samples* getSamples(char *fileName){
 	data_collection *d = read_data(fileName);
 	samples *s = (samples*)malloc(sizeof(samples));
-	vector<vector<double>> data;
-	vector<double> answers;
+	vector<vector<double> > *data = new vector<vector<double> >();
+	vector<double> *answers = new vector<double>();
 	for(int i = 0; i < d->num_arrays; i++){
 		vector<double> sample;
 		for(int j = 0; j < d->size; j++){
@@ -43,8 +46,8 @@ samples* getSamples(char *fileName){
 				sample.push_back((double)d->data[i][j][k]);
 			}
 		}
-		data.push_back(sample);
-		answers.push_back((double)d->answers[i]);
+		data->push_back(sample);
+		answers->push_back((double)d->answers[i]);
 	}
 	s->inputData = data;
 	s->sampleSize = d->size * d->size;

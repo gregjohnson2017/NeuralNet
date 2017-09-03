@@ -6,8 +6,8 @@
 using namespace std;
 
 typedef struct samples{
-	vector<vector<double>> inputData;
-	vector<double> answers;
+	vector<vector<double> > *inputData;
+	vector<double> *answers;
 	int sampleSize; // length of 1d array stretch before next sample
 	// ex 64x64 image: sampleSize = 4096
 } samples;
