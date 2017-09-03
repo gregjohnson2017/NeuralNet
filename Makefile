@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall -Werror -g
 
-all: utils neuron layer network quantify gimage main
+all: main
 
 utils: utils.cpp utils.h
 	$(CC) $(CFLAGS) -c utils.cpp -o utils.o
