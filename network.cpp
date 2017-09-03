@@ -68,21 +68,10 @@ vector<double> Network::getOutputs(){
 FIX ME !!!!!!!!!!!
 */	
 void Network::train(samples *s){
-	
-	
-	// train a network with an entire set of data
-	// s->inputData is all of the input data in a 1d array
-	// s->answers are the answers per s->sampleSize section of s->inputData  
-
-	/*vector<double> error = subtract(answers, guesses);
-	for(int i = 0; i < (int)layers.size(); i++){
-		for(int j = 0; j < (int)layers[i].neurons.size(); j++){
-			for(int k = 0; k < (int)layers[i].neurons[j].weights.size(); k++){
-				layers[i].neurons[j].weights[k] += trainingConstant() * 0 * layers[i].outputs[k];
-				// replace 0 with error, or some sort of back propagation approach
-			}
-		}
-	}*/
+	// feed network
+	// compute output errors
+	// back propagate
+	// gradient decent (to modify biases and weights)
 }
 
 void Network::computeOutputError(double answer){
