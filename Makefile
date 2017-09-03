@@ -24,4 +24,4 @@ main: utils.o network.o layer.o neuron.o ./Quantifier/quantify.o ./Quantifier/gi
 	$(CC) $(CFLAGS) neuron.o layer.o network.o ./Quantifier/quantify.o ./Quantifier/gimage.o utils.o main.cpp -o net -lpng -lz
 
 clean:
-	rm -f *.o net && cd ./Quantify && make clean
+	rm -f *.o net && cd ./Quantifier && make clean
