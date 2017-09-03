@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g -Wall -Ilpng1632
+#CFLAGS=-g -Wall -Ilpng1632
 CFLAGS=-Wall -Werror -g
 
 all: utils neuron layer network main
@@ -24,4 +24,4 @@ main: utils.o network.o layer.o neuron.o ./Quantifier/quantify.o ./Quantifier/gi
 	$(CC) $(CFLAGS) neuron.o layer.o network.o ./Quantifier/quantify.o ./Quantifier/gimage.o utils.o main.cpp -o net -lpng -lz
 
 clean:
-	rm *.o net && cd ./Quantify && make clean
+	rm -f *.o net && cd ./Quantify && make clean
