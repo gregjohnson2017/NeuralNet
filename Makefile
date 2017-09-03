@@ -1,5 +1,4 @@
 CC=g++
-#CFLAGS=-g -Wall -Ilpng1632
 CFLAGS=-Wall -Werror -g
 
 all: utils neuron layer network main
