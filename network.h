@@ -1,7 +1,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
-#include "layer.h"
+#include <stdio.h>
 #include <vector>
+#include "layer.h"
 using namespace std;
 class Network{
 	public:

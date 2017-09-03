@@ -89,7 +89,7 @@ void Network::backPropagate(){
 				double e = layers[l+1].neurons[k].error;
 				// set z
 				double z = layers[l].neurons[j].z;
-				sum += w * g * sigmoid_prime(z);
+				sum += w * e * sigmoid_prime(z);
 			// set error for the neuron to sum
 			layers[l].neurons[j].error = sum;
 			}
@@ -125,7 +125,7 @@ void Network::saveNetwork(char *fileName){
 		for(int j = 0; j < layers[i].nNeurons; j++){
 			int nWeights = layers[i].neurons[j].weights.size();
 			fwrite(&nWeights, sizeof(nWeights), 1, fp);
-			for(int k = 0; k < layers[i].neurons[j].weights.size(); k++){
+			for(int k = 0; k < (int)layers[i].neurons[j].weights.size(); k++){
 				fwrite(&layers[i].neurons[j].weights[k], sizeof(layers[i].neurons[j].weights[k]), 1, fp);
 			}
 			fwrite(&layers[i].neurons[j].bias, sizeof(layers[i].neurons[j].bias), 1, fp);
