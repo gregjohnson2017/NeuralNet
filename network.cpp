@@ -72,8 +72,29 @@ void Network::train(vector<double> &guesses, vector<double> &answers){
 	}
 }
 
-void Network::backPropagate(vector<double> &weights, vector<double> &error, vector<double> &z){
-	return;
+/*
+comment me
+*/
+void Network::backPropagate(){
+	// loop through layers l = L-1, L-2, ..., 2
+	for (int l = nLayers - 2; l >= 1; l--) { // L-1 <=> nLayers - 2; 2 <=> 1
+		// loop through neurons j in layer l
+		for (int j = 0; j < layers[l].nNeurons; j++) {
+			double sum = 0;
+			// loop through neurons k in layer l+1
+			for (int k = 0; k < layers[l+1].nNeurons; k++) {
+				// set w
+				double w = layers[l+1].neurons[k].weights[j];
+				// set e
+				double e = layers[l+1].neurons[k].error;
+				// set z
+				double z = layers[l].neurons[j].z;
+				sum += w * g * sigmoid_prime(z);
+			// set error for the neuron to sum
+			layers[l].neurons[j].error = sum;
+			}
+		}
+	}
 }
 
 /*

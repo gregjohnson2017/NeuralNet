@@ -4,11 +4,13 @@
 using namespace std;
 class Neuron {
 	public:
-		double bias;
 		vector<double> weights;
 		Neuron(int);
 		Neuron(vector<double> &weights, double bias);
 		~Neuron();
+		double bias;
+		double error;
+		double z;
 		double feed(vector<double> &);
 };
 #endif

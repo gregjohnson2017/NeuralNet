@@ -15,9 +15,9 @@ class Network{
 		vector<Layer> layers;
 		vector<double> getOutputs(vector<double> &inputs);
 		void train(vector<double> &inputs, vector<double> &answers);
-		void backPropagate(vector<double> &weights, vector<double> &error, vector<double> &z);
 		void saveNetwork(char *fileName);
 		Network* loadNetwork(char *fileName);
+		void backPropagate();
 };
 #endif
 

@@ -18,6 +18,8 @@ Neuron::Neuron(int nWeights){
 	for(int i = 0; i < nWeights; i++){
 		weights.push_back(rand() * 2 - 1); // -1 to 1 non-inclusive
 	}
+	error = 0;
+	z = 0;
 }
 
 /*
