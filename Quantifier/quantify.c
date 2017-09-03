@@ -1,3 +1,4 @@
+#include "quantify.h"
 #include "gimage.h"
 #include <math.h>
 #include <stdlib.h>
@@ -47,10 +48,6 @@ int count_files(char *dir){
 	closedir(fd);
 	return count;
 }
-
-struct data_collection{
-	int ***data, *answers, num_arrays, size;
-};
 
 struct data_collection* create_data(int num_arrays, int size){
 	struct data_collection *data_c = malloc(sizeof(struct data_collection));
@@ -159,14 +156,7 @@ void print_data(struct data_collection *d){
 	printf("End of file.\n");
 }
 
-int main(int argc, char **argv){
-	int size = 64;
-	write_data("/home/greg/Documents/NeuralNet/Quantifier/Samples", size, "nums.dat");
-	struct data_collection *d = read_data("nums.dat");
-	print_data(d);
-	destroy_data(d);
-	return 1;
-}
+
 
 
 

@@ -4,6 +4,13 @@
 #include <vector>
 #include "layer.h"
 using namespace std;
+
+typedef struct samples{
+	vector<double> inputData, answers;
+	int sampleSize; // length of 1d array stretch before next sample
+	// ex 64x64 image: sampleSize = 4096
+} samples;
+
 class Network{
 	public:
 		int nLayers, nInputs, nOutputs;
@@ -15,7 +22,7 @@ class Network{
 		}
 		vector<Layer> layers;
 		vector<double> getOutputs(vector<double> &inputs);
-		void train(vector<double> &inputs, vector<double> &answers);
+		void train(samples *s);
 		void saveNetwork(char *fileName);
 		Network* loadNetwork(char *fileName);
 		void backPropagate();

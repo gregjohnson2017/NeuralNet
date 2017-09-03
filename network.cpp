@@ -55,13 +55,15 @@ vector<double> Network::getOutputs(vector<double> &inputs){
 }
 	
 /*
-This will train all the neurons in the network by calculating their error
-from a known answer, and modifying their weights respetively.
-In every layer, each neuron gets all the inputs from the previous layer.
+FIX ME !!!!!!!!!!!
 */	
-void Network::train(vector<double> &guesses, vector<double> &answers){
-	if(guesses.size() != answers.size()) throw invalid_argument("mismatched guesses and answers");
-	vector<double> error = subtract(answers, guesses);
+void Network::train(samples *s){
+
+	// train a network with an entire set of data
+	// s->inputData is all of the input data in a 1d array
+	// s->answers are the answers per s->sampleSize section of s->inputData  
+
+	/*vector<double> error = subtract(answers, guesses);
 	for(int i = 0; i < (int)layers.size(); i++){
 		for(int j = 0; j < (int)layers[i].neurons.size(); j++){
 			for(int k = 0; k < (int)layers[i].neurons[j].weights.size(); k++){
@@ -69,11 +71,11 @@ void Network::train(vector<double> &guesses, vector<double> &answers){
 				// replace 0 with error, or some sort of back propagation approach
 			}
 		}
-	}
+	}*/
 }
 
 /*
-comment me
+Calculates and updates the errors of the neurons
 */
 void Network::backPropagate(){
 	// loop through layers l = L-1, L-2, ..., 2
