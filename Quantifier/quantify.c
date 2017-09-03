@@ -6,9 +6,9 @@
 #include <string.h>
 
 int** getData(image *i, int size){
-	int **data = malloc(sizeof(int*) * size);
+	int **data = (int**)malloc(sizeof(int*) * size);
 	for(int i = 0; i < size; i++){
-		data[i] = malloc(sizeof(int) * size);
+		data[i] = (int*)malloc(sizeof(int) * size);
 	}
 	if(i->width != size || i->height != size) {
 		printf("Size is not %dx%d!\n", size, size);
@@ -50,13 +50,13 @@ int count_files(char *dir){
 }
 
 struct data_collection* create_data(int num_arrays, int size){
-	struct data_collection *data_c = malloc(sizeof(struct data_collection));
-	int ***data = malloc(sizeof(int**) * num_arrays);
-	int *answers = malloc(sizeof(int) * num_arrays);
+	struct data_collection *data_c = (struct data_collection*)malloc(sizeof(struct data_collection));
+	int ***data = (int***)malloc(sizeof(int**) * num_arrays);
+	int *answers = (int*)malloc(sizeof(int) * num_arrays);
 	for(int i = 0; i < num_arrays; i++){
-		data[i] = malloc(sizeof(int*) * size);
+		data[i] = (int**)malloc(sizeof(int*) * size);
 		for(int j = 0; j < size; j++){
-			data[i][j] = malloc(sizeof(int) * size);
+			data[i][j] = (int*)malloc(sizeof(int) * size);
 		}
 	}
 	data_c->data = data;
@@ -112,7 +112,7 @@ void write_data(char *dir, int size, char *data_file){
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")){
 			continue;    /* skip self and parent */
 		}
-		char *path = malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
+		char *path = (char*)malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
 		sprintf(path, "%s/%s", dir, dp->d_name);
 		image *i = extract_from_png(path);
 		
