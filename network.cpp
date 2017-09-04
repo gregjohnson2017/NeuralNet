@@ -60,6 +60,7 @@ void Network::feedNetwork(vector<double> &inputs){
 vector<double> Network::getOutputs(){
   vector<double> outputs;
   for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
+    printf("adding %f to vector\n", layers[layers.size() - 1].neurons[i].a);
     outputs.push_back(layers[layers.size() - 1].neurons[i].a);
   }
   return outputs;
@@ -72,14 +73,10 @@ void Network::train(samples *s){
   double batchWeightSum = 0;
   double batchBiasSum = 0;
   for(int i = 0; i < (int)s->inputData->size(); i++){
-    printf("feed network\n");
     feedNetwork(s->inputData->at(i));
-    printf("compute error\n");
     computeOutputError(s->answers->at(i));
-    printf("start backprop\n");
     backPropagate();
     
-    printf("start gradient descent\n");
     // gradient decent (to modify biases and weights)
     for(int j = 1; j < (int)layers.size(); j++){
       for(int k = 0; k < (int)layers[j].neurons.size(); k++){
@@ -90,7 +87,7 @@ void Network::train(samples *s){
       }	
     }
     if(i % Network::batchSize() == 0){
-      printf("Batch %d out of %d\n", i/5, (int)s->inputData->size());
+      printf("Batch %d out of %d\n", i/5, (int)s->inputData->size() / 5);
       for(int j = 1; j < (int)layers.size(); j++){
         for(int k = 0; k < (int)layers[j].neurons.size(); k++){
           for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
@@ -124,12 +121,12 @@ void Network::backPropagate(){
       double sum = 0;
       // loop through neurons k in layer l+1
       for(int k = 0; k < layers[l + 1].nNeurons; k++){
-	double w = layers[l + 1].neurons[k].weights[j];
-	double e = layers[l + 1].neurons[k].error;
-	double z = layers[l].neurons[j].z;
-	sum += w * e * sigmoid_prime(z);
-	// set error for the neuron to sum
-	layers[l].neurons[j].error = sum;
+	      double w = layers[l + 1].neurons[k].weights[j];
+	      double e = layers[l + 1].neurons[k].error;
+	      double z = layers[l].neurons[j].z;
+	      sum += w * e * sigmoid_prime(z);
+	      // set error for the neuron to sum
+	      layers[l].neurons[j].error = sum;
       }
     }
   }
