@@ -47,6 +47,7 @@ Completes one pass through the network, returning the outputs of the neurons
 in the final layer.
 */
 void Network::feedNetwork(vector<double> &inputs){
+	if(inputs.size() != layers[0].size()) throw invalid_argument("inputs != input layer");
 	for(int i = 0; i < nLayers; i++){
 		vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
 		for(int j = 0; j < (int)layers[i].neurons.size(); j++){
@@ -68,10 +69,22 @@ vector<double> Network::getOutputs(){
 FIX ME !!!!!!!!!!! cause I am borked
 */	
 void Network::train(samples *s){
-	// feed network
-	// compute output errors
-	// back propagate
-	// gradient decent (to modify biases and weights)
+	vector<vector<double> > sampleLayerSums;
+	for(int i = 0; i < s->inputData.size(); i++){
+		feedNetwork(s->inputData[i]);
+		computeOutputError(s->answers[i]);
+		backPropagate();
+		for(int j = 1; j < layers.size(); j++){
+			double layerSum = 0;
+			for(int k = 0; k < layers[j]->neurons.size(); k++){
+				layerSum += layers[j]->neurons[k].error * layers[j - 1]->neurons[k].activation;
+			}	
+		}
+		// gradient decent (to modify biases and weights)
+		if(i % Network::batchSize == 0){
+					
+		}
+	}
 }
 
 void Network::computeOutputError(double answer){
@@ -151,9 +164,9 @@ Network* Network::loadNetwork(char *fileName){
 		throw invalid_argument("file IO error");
 	}
 	int nInputs, nOutputs, nLayers;
-	fwrite(&nInputs, sizeof(int), 1, fp);
-	fwrite(&nOutputs, sizeof(int), 1, fp);
-	fwrite(&nLayers, sizeof(int), 1, fp);
+	fread(&nInputs, sizeof(int), 1, fp);
+	fread(&nOutputs, sizeof(int), 1, fp);
+	fread(&nLayers, sizeof(int), 1, fp);
 	vector<Layer> layers;
 	for(int i = 0; i < nLayers; i++){
 		vector<Neuron> neurons;

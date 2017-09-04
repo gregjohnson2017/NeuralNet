@@ -19,7 +19,10 @@ class Network{
 		Network(vector<Layer> &layers, int nInputs, int nOutputs);
 		~Network();
 		static double trainingConstant(){
-			return 1;
+			return 0.9;
+		}
+		static int batchSize(){
+			return 5;
 		}
 		vector<Layer> layers;
 		vector<double> getOutputs();
