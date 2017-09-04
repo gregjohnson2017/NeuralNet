@@ -13,6 +13,7 @@ extern "C" {
 }
 
 samples* getSamples(const char *fileName);
+void printSample(vector<double> sample);
 
 using namespace std;
 
@@ -24,6 +25,7 @@ int main(int argc, char **argv){
   samples *s = getSamples("./Quantifier/nums.dat");
   for(int i = 0; i < (int)s->inputData->size(); i++){
     n->feedNetwork(s->inputData->at(i));
+    printSample(s->inputData->at(i));
     vector<double> outputs = n->getOutputs();
     for(int j = 0; j < (int)outputs.size(); j++){
       printf("N%d = %f\t", j, outputs[j]);
@@ -32,7 +34,7 @@ int main(int argc, char **argv){
     outputs.clear();
     getchar();
   }
-  #else
+#else
   Network *n = new Network(5, 4096, 10);
   samples *s = getSamples("./Quantifier/nums.dat");
   n->train(s);
@@ -41,8 +43,17 @@ int main(int argc, char **argv){
   delete s->inputData;
   delete s->answers;
   free(s);
-  #endif
+#endif
   return 1;
+}
+
+void printSample(vector<double> sample){
+  for(int i = 0; i < (int)sample.size(); i++){
+    printf("%d, ", (int)sample[i]);
+    if(i%64==0){
+      printf("\n");
+    }
+  }
 }
 
 samples* getSamples(const char *fileName){

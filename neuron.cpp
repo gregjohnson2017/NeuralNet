@@ -15,13 +15,14 @@
   Each neuron also gets a random bias (-1 to 1 non-inclusive).
 */
 Neuron::Neuron(int nWeights){
-  bias = rand() * 2 - 1; // -1 to 1 non-inclusive
+  bias = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
   for(int i = 0; i < nWeights; i++){
-    weights.push_back(rand() * 2 - 1); // -1 to 1 non-inclusive
+    double w = rand()/(double)RAND_MAX * 2 - 1;
+    weights.push_back(w); // -1 to 1 non-inclusive
   }
   error = 0;
   z = 0;
-  a = 0;
+  a = 123;
 }
 
 /*
