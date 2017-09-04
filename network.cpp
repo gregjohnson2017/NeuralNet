@@ -70,14 +70,14 @@ FIX ME !!!!!!!!!!! cause I am borked
 */	
 void Network::train(samples *s){
 	vector<vector<double> > sampleLayerSums;
-	for(int i = 0; i < s->inputData.size(); i++){
-		feedNetwork(s->inputData[i]);
-		computeOutputError(s->answers[i]);
+	for(int i = 0; i < (int)s->inputData->size(); i++){
+		feedNetwork(s->inputData->at(i));
+		computeOutputError(s->answers->at(i));
 		backPropagate();
-		for(int j = 1; j < layers.size(); j++){
+		for(int j = 1; j < (int)layers.size(); j++){
 			double layerSum = 0;
-			for(int k = 0; k < layers[j]->neurons.size(); k++){
-				layerSum += layers[j]->neurons[k].error * layers[j - 1]->neurons[k].activation;
+			for(int k = 0; k < (int)layers[j].neurons.size(); k++){
+				layerSum += layers[j].neurons[k].error * layers[j - 1].neurons[k].a;
 			}	
 		}
 		// gradient decent (to modify biases and weights)

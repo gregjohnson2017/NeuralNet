@@ -29,7 +29,7 @@ int main(int argc, char **argv){
 	delete s->answers;
 	free(s);
 	free(dataFile);
-	free(networkFile);
+	//free(networkFile);
 	return 1;
 }
 
