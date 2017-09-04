@@ -79,18 +79,24 @@ void destroy_data(struct data_collection *d){
 
 struct data_collection* read_data(char *data_file){
 	FILE *fp = fopen(data_file, "rb");
+	if(!fp){
+		fprintf(stderr, "FILE %s NOT FOUND\n", data_file);
+		abort();
+	}
 	int num_arrays, size;
-	fread(&num_arrays, sizeof(int), 1, fp);
-	fread(&size, sizeof(int), 1, fp);
+	size_t gcc = 0;
+	gcc += fread(&num_arrays, sizeof(int), 1, fp) * sizeof(int);
+	gcc += fread(&size, sizeof(int), 1, fp) * sizeof(int);
 	struct data_collection *data_c = create_data(num_arrays, size);
 	for(int i = 0; i < num_arrays; i++){
 		for(int j = 0; j < size; j++){
-			fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), size, fp);
+			gcc += fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), size, fp) * sizeof(*data_c->data[i][j]);
 		}
 		int answer;
-		fread(&answer, sizeof(int), 1, fp);
+		gcc += fread(&answer, sizeof(int), 1, fp) * sizeof(int); 
 		data_c->answers[i] = answer;
 	}
+	printf("Read %d arrays of size %d (%lu bytes) from %s\n", num_arrays, size, gcc, data_file); 
 	fclose(fp);
 	return data_c;
 }
