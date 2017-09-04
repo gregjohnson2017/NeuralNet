@@ -36,7 +36,7 @@ int main(int argc, char **argv){
   samples *s = getSamples("./Quantifier/nums.dat");
   n->train(s);
   //char *networkFile = strdup("network.nn"); // for Greg's education
-  n->saveNetwork("network2.nn");
+  n->saveNetwork("network.nn");
   delete s->inputData;
   delete s->answers;
   free(s);*/
