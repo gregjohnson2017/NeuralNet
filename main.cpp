@@ -20,7 +20,7 @@ using namespace std;
 int main(int argc, char **argv){
   srand(time(NULL));
   
- /* Network *n = new Network("network.nn");
+ /*Network *n = new Network("network.nn");
   samples *s = getSamples("./Quantifier/nums.dat");
   for(int i = 0; i < (int)s->inputData->size(); i++){
     n->feedNetwork(s->inputData->at(i));

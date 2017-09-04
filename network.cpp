@@ -60,7 +60,7 @@ void Network::feedNetwork(vector<double> &inputs){
 vector<double> Network::getOutputs(){
   vector<double> outputs;
   for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
-    printf("adding %f to vector\n", layers[layers.size() - 1].neurons[i].a);
+    //printf("adding %f to vector\n", layers[layers.size() - 1].neurons[i].a);
     outputs.push_back(layers[layers.size() - 1].neurons[i].a);
   }
   return outputs;
@@ -82,12 +82,14 @@ void Network::train(samples *s){
       for(int k = 0; k < (int)layers[j].neurons.size(); k++){
         for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
           batchWeightSum += layers[j].neurons[k].error * layers[j - 1].neurons[l].a;
+          //printf("error = %e, activation = %e\n", layers[j].neurons[k].error, layers[j - 1].neurons[l].a);
         }
         batchBiasSum += layers[j].neurons[k].error;
       }	
     }
     if(i % Network::batchSize() == 0){
       printf("Batch %d out of %d\n", i/5, (int)s->inputData->size() / 5);
+      printf("bias sum = %e, weight sum = %e\n", batchBiasSum, batchWeightSum);
       for(int j = 1; j < (int)layers.size(); j++){
         for(int k = 0; k < (int)layers[j].neurons.size(); k++){
           for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
@@ -106,7 +108,9 @@ void Network::computeOutputError(double answer){
   for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
     double y = i - 1 == answer ? 1 : 0;
     Neuron n = layers[layers.size() - 1].neurons[i];
+    //printf("sigmoid_prime(z)=%e, z = %e\n", sigmoid_prime(n.z), n.z);
     n.error = (n.a - y) * sigmoid_prime(n.z);
+    printf("final error = %e\n", n.error);
   }
 }
 
@@ -126,8 +130,8 @@ void Network::backPropagate(){
 	      double z = layers[l].neurons[j].z;
 	      sum += w * e * sigmoid_prime(z);
 	      // set error for the neuron to sum
-	      layers[l].neurons[j].error = sum;
       }
+      layers[l].neurons[j].error = sum;
     }
   }
 }
