@@ -66,23 +66,41 @@ vector<double> Network::getOutputs(){
 }
 
 /*
-  FIX ME !!!!!!!!!!! cause I am borked
+comment me
 */	
 void Network::train(samples *s){
-  vector<vector<double> > sampleLayerSums;
+  double batchWeightSum = 0;
+  double batchBiasSum = 0;
   for(int i = 0; i < (int)s->inputData->size(); i++){
+    printf("feed network\n");
     feedNetwork(s->inputData->at(i));
+    printf("compute error\n");
     computeOutputError(s->answers->at(i));
+    printf("start backprop\n");
     backPropagate();
+    
+    printf("start gradient descent\n");
+    // gradient decent (to modify biases and weights)
     for(int j = 1; j < (int)layers.size(); j++){
-      double layerSum = 0;
       for(int k = 0; k < (int)layers[j].neurons.size(); k++){
-        layerSum += layers[j].neurons[k].error * layers[j - 1].neurons[k].a;
+        for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
+          batchWeightSum += layers[j].neurons[k].error * layers[j - 1].neurons[l].a;
+        }
+        batchBiasSum += layers[j].neurons[k].error;
       }	
     }
-    // gradient decent (to modify biases and weights)
     if(i % Network::batchSize() == 0){
-      //Uninmplemented
+      printf("Batch %d out of %d\n", i/5, (int)s->inputData->size());
+      for(int j = 1; j < (int)layers.size(); j++){
+        for(int k = 0; k < (int)layers[j].neurons.size(); k++){
+          for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
+            layers[j].neurons[k].weights[l] -= (trainingConstant()/batchSize()) * batchWeightSum;
+          }
+          layers[j].neurons[k].bias -= (trainingConstant()/batchSize()) * batchBiasSum;
+        }
+      }
+      batchWeightSum = 0;
+      batchBiasSum = 0;
     }
   }
 }

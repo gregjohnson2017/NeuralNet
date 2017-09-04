@@ -18,14 +18,29 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  Network *n = new Network(5, 4096, 10);
+  
+  Network *n = new Network("network.nn");
+  samples *s = getSamples("./Quantifier/nums.dat");
+  for(int i = 0; i < (int)s->inputData->size(); i++){
+    n->feedNetwork(s->inputData->at(i));
+    vector<double> outputs = n->getOutputs();
+    for(int j = 0; j < (int)outputs.size(); j++){
+      printf("N%d = %f\t", j, outputs[j]);
+    }
+    printf("\n");
+    outputs.clear();
+    getchar();
+  }
+  
+  /*Network *n = new Network(5, 4096, 10);
   samples *s = getSamples("./Quantifier/nums.dat");
   n->train(s);
   //char *networkFile = strdup("network.nn"); // for Greg's education
-  n->saveNetwork("network.nn");
+  n->saveNetwork("network2.nn");
   delete s->inputData;
   delete s->answers;
-  free(s);
+  free(s);*/
+  
   return 1;
 }
 
