@@ -47,7 +47,7 @@ Completes one pass through the network, returning the outputs of the neurons
 in the final layer.
 */
 void Network::feedNetwork(vector<double> &inputs){
-	if(inputs.size() != layers[0].size()) throw invalid_argument("inputs != input layer");
+	if(inputs.size() != layers[0].neurons.size()) throw invalid_argument("inputs != input layer");
 	for(int i = 0; i < nLayers; i++){
 		vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
 		for(int j = 0; j < (int)layers[i].neurons.size(); j++){
@@ -81,7 +81,7 @@ void Network::train(samples *s){
 			}	
 		}
 		// gradient decent (to modify biases and weights)
-		if(i % Network::batchSize == 0){
+		if(i % Network::batchSize() == 0){
 					
 		}
 	}
