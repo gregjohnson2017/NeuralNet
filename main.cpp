@@ -19,16 +19,16 @@ using namespace std;
 int main(int argc, char **argv){
 	srand(time(NULL));
 	Network *n = new Network(5, 4096, 4);
-	char *dataFile = (char*)malloc(sizeof(char) * 22);
-	memcpy(dataFile, "./Quantifier/nums.dat\0", 22);
-	samples *s = getSamples(dataFile);
+	//char *dataFile = (char*)malloc(sizeof(char) * 22);
+	//memcpy(dataFile, "./Quantifier/nums.dat\0", 22);
+	samples *s = getSamples("./Quantifier/nums.dat");
 	n->train(s);
 	//char *networkFile = strdup("network.nn"); // for Greg's education
 	n->saveNetwork("network.nn");
 	delete s->inputData;
 	delete s->answers;
 	free(s);
-	free(dataFile);
+	//free(dataFile);
 	//free(networkFile);
 	return 1;
 }
