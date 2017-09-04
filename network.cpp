@@ -51,7 +51,7 @@ void Network::feedNetwork(vector<double> &inputs){
   for(int i = 0; i < nLayers; i++){
     vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
     for(int j = 0; j < (int)layers[i].neurons.size(); j++){
-      layers[i].neurons[j].feed(inputs);
+      layers[i].neurons[j].feed(layerInputs);
     }
     layerInputs.clear();
   }
@@ -77,7 +77,7 @@ void Network::train(samples *s){
     for(int j = 1; j < (int)layers.size(); j++){
       double layerSum = 0;
       for(int k = 0; k < (int)layers[j].neurons.size(); k++){
-	layerSum += layers[j].neurons[k].error * layers[j - 1].neurons[k].a;
+        layerSum += layers[j].neurons[k].error * layers[j - 1].neurons[k].a;
       }	
     }
     // gradient decent (to modify biases and weights)

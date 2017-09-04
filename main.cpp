@@ -20,7 +20,7 @@ int main(int argc, char **argv){
   srand(time(NULL));
   Network *n = new Network(5, 4096, 10);
   samples *s = getSamples("./Quantifier/nums.dat");
-  //n->train(s);
+  n->train(s);
   //char *networkFile = strdup("network.nn"); // for Greg's education
   n->saveNetwork("network.nn");
   delete s->inputData;
