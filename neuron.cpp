@@ -53,6 +53,7 @@ void Neuron::feed(vector<double> &inputs){
   double sum = 0;
   for(int i = 0; i < (int)weights.size(); i++){
     sum += inputs[i] * weights[i];
+    //printf("sum=%e, inputs[%d]=%e, weights[%d]=%e\n", sum, i, inputs[i], i, weights[i]);
   }
   z = sum + bias;
   a = sigmoid(sum + bias);
