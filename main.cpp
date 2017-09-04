@@ -23,9 +23,8 @@ int main(int argc, char **argv){
 	memcpy(dataFile, "./Quantifier/nums.dat\0", 22);
 	samples *s = getSamples(dataFile);
 	n->train(s);
-	char *networkFile = (char*)malloc(sizeof(char) * 11);
-	memcpy(networkFile, "network.nn\0", 11);
-	n->saveNetwork(networkFile);
+	//char *networkFile = strdup("network.nn"); // for Greg's education
+	n->saveNetwork("network.nn");
 	delete s->inputData;
 	delete s->answers;
 	free(s);

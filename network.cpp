@@ -118,7 +118,7 @@ nLayers (int)
 	...
 EOF
 */
-void Network::saveNetwork(char *fileName){
+void Network::saveNetwork(const char *fileName){
 	FILE *fp = fopen(fileName, "wb");
 	if(!fp){
 		printf("Error opening %s\n", fileName);
@@ -144,7 +144,7 @@ void Network::saveNetwork(char *fileName){
 /*
  Loads a network from specified file. (See saveNetwork for file format)
  */
-Network::Network(char *fileName){
+Network::Network(const char *fileName){
 	FILE *fp = fopen(fileName, "rb");
 	if(!fp){
 		printf("Error opening %s\n", fileName);
