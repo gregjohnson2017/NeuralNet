@@ -17,6 +17,7 @@ samples* getSamples(const char *fileName);
 using namespace std;
 
 int main(int argc, char **argv){
+  #ifdef PRINT_MAIN_2
   srand(time(NULL));
   
   Network *n = new Network("network.nn");
@@ -31,16 +32,16 @@ int main(int argc, char **argv){
     outputs.clear();
     getchar();
   }
-  
-  /*Network *n = new Network(5, 4096, 10);
+  #else
+  Network *n = new Network(5, 4096, 10);
   samples *s = getSamples("./Quantifier/nums.dat");
   n->train(s);
   //char *networkFile = strdup("network.nn"); // for Greg's education
   n->saveNetwork("network.nn");
   delete s->inputData;
   delete s->answers;
-  free(s);*/
-  
+  free(s);
+  #endif
   return 1;
 }
 
