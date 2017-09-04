@@ -47,7 +47,7 @@ Completes one pass through the network, returning the outputs of the neurons
 in the final layer.
 */
 void Network::feedNetwork(vector<double> &inputs){
-	if(inputs.size() != layers[0].size()) throw invalid_argument("inputs != input layer");
+	if(inputs.size() != layers[0].neurons.size()) throw invalid_argument("inputs != input layer");
 	for(int i = 0; i < nLayers; i++){
 		vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
 		for(int j = 0; j < (int)layers[i].neurons.size(); j++){
@@ -70,18 +70,18 @@ FIX ME !!!!!!!!!!! cause I am borked
 */	
 void Network::train(samples *s){
 	vector<vector<double> > sampleLayerSums;
-	for(int i = 0; i < s->inputData.size(); i++){
-		feedNetwork(s->inputData[i]);
-		computeOutputError(s->answers[i]);
+	for(int i = 0; i < (int)s->inputData->size(); i++){
+		feedNetwork(s->inputData->at(i));
+		computeOutputError(s->answers->at(i));
 		backPropagate();
-		for(int j = 1; j < layers.size(); j++){
+		for(int j = 1; j < (int)layers.size(); j++){
 			double layerSum = 0;
-			for(int k = 0; k < layers[j]->neurons.size(); k++){
-				layerSum += layers[j]->neurons[k].error * layers[j - 1]->neurons[k].activation;
+			for(int k = 0; k < (int)layers[j].neurons.size(); k++){
+				layerSum += layers[j].neurons[k].error * layers[j - 1].neurons[k].a;
 			}	
 		}
 		// gradient decent (to modify biases and weights)
-		if(i % Network::batchSize == 0){
+		if(i % Network::batchSize() == 0){
 					
 		}
 	}
