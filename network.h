@@ -17,6 +17,7 @@ class Network{
 		int nLayers, nInputs, nOutputs;
 		Network(int nLayers, int nInputs, int nOutputs);
 		Network(vector<Layer> &layers, int nInputs, int nOutputs);
+		Network(char *fileName);
 		~Network();
 		static double trainingConstant(){
 			return 0.9;
@@ -31,7 +32,6 @@ class Network{
 		void backPropagate();
 		void computeOutputError(double answer);
 		void saveNetwork(char *fileName);
-		Network* loadNetwork(char *fileName);
 };
 #endif
 

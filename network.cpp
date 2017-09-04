@@ -96,8 +96,8 @@ void Network::computeOutputError(double answer){
 }
 
 /*
-Calculates and updates the errors of the neurons
-*/
+  Calculates and updates the errors of the neurons
+ */
 void Network::backPropagate(){
 	// loop through layers l = L-1, L-2, ..., 2
 	for(int l = nLayers - 2; l >= 1; l--){ // L-1 <=> nLayers - 2; 2 <=> 1
@@ -155,47 +155,37 @@ void Network::saveNetwork(char *fileName){
 }
 
 /*
-Loads a network from specified file. (See saveNetwork for file format)
-*/
-Network* Network::loadNetwork(char *fileName){
+ Loads a network from specified file. (See saveNetwork for file format)
+ */
+Network::Network(char *fileName){
 	FILE *fp = fopen(fileName, "rb");
 	if(!fp){
 		printf("Error opening %s\n", fileName);
 		throw invalid_argument("file IO error");
 	}
+	size_t gcc = 0;
 	int nInputs, nOutputs, nLayers;
-	fread(&nInputs, sizeof(int), 1, fp);
-	fread(&nOutputs, sizeof(int), 1, fp);
-	fread(&nLayers, sizeof(int), 1, fp);
-	vector<Layer> layers;
+	gcc += fread(&nInputs, sizeof(int), 1, fp) * sizeof(int);
+	gcc += fread(&nOutputs, sizeof(int), 1, fp) * sizeof(int);
+	gcc += fread(&nLayers, sizeof(int), 1, fp) * sizeof(int);
 	for(int i = 0; i < nLayers; i++){
 		vector<Neuron> neurons;
 		int nNeurons;
-		fread(&nNeurons, sizeof(int), 1, fp);
+		gcc += fread(&nNeurons, sizeof(int), 1, fp) * sizeof(int);
 		for(int j = 0; j < nNeurons; j++){
 			vector<double> weights;
 			int nWeights;
-			fread(&nWeights, sizeof(int), 1, fp);
+			gcc += fread(&nWeights, sizeof(int), 1, fp) * sizeof(int);
 			for(int k = 0; k < nWeights; k++){
 				double weight;
-				fread(&weight, sizeof(double), 1, fp);
+				gcc += fread(&weight, sizeof(double), 1, fp) * sizeof(double);
 				weights.push_back(weight);
 			}
 			double bias;
-			fread(&bias, sizeof(double), 1, fp);
+			gcc += fread(&bias, sizeof(double), 1, fp) * sizeof(double);
 			neurons.push_back(Neuron(weights, bias));
 		}
 		layers.push_back(Layer(neurons));
 	}
-	return new Network(layers, nInputs, nOutputs);
+	printf("Loaded neural network from file %s with %d inputs %d outputs %d layers (read %lu bytes).\n", fileName, nInputs, nOutputs, nLayers, gcc);
 }
-
-
-
-
-
-
-
-
-
-
