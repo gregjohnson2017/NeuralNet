@@ -21,7 +21,8 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
 		// if the layer is not the input layer, then the number of neurons in the layer
 		// will depend on the number of inputs received from the previous layer
 		// (i.e. number of neurons in the prevous layer)
-		layers.push_back(Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1].nNeurons));
+		printf("layer %d wants %d neurons, sending %lu as nInputs\n", i, neuronsPerLayer, i == 0 ? nInputs : layers[i - 1].neurons.size());
+		layers.push_back(Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1].neurons.size()));
 	}
 }
 

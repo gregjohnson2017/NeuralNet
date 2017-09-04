@@ -1,6 +1,6 @@
 #include "neuron.h"
 #include "layer.h"
-
+#include <stdio.h>
 /*
 Random Layer constructor, builds a layer of nNeurons neurons.
 Each neuron will be initialized randomly with nInputs weights and a bias.
