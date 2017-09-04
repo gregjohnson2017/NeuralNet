@@ -17,8 +17,8 @@
 Neuron::Neuron(int nWeights){
   bias = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
   for(int i = 0; i < nWeights; i++){
-    double w = rand()/(double)RAND_MAX * 2 - 1;
-    weights.push_back(w); // -1 to 1 non-inclusive
+    double w = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
+    weights.push_back(w);
   }
   error = 0;
   z = 0;

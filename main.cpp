@@ -39,9 +39,9 @@ int main(int argc, char **argv){
   n->train(s);
   //char *networkFile = strdup("network.nn"); // for Greg's education
   n->saveNetwork("network.nn");
-  delete s->inputData;
-  delete s->answers;
-  free(s);
+ // delete s->inputData;
+  //delete s->answers;
+  //free(s);
   
   return 1;
 }

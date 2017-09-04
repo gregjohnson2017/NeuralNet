@@ -70,38 +70,16 @@ vector<double> Network::getOutputs(){
 comment me
 */
 void Network::train(samples *s){
-  double batchWeightSum = 0;
-  double batchBiasSum = 0;
   for(int i = 0; i < (int)s->inputData->size(); i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    // gradient decent (to modify biases and weights)
-    for(int j = (int)layers.size() - 1; j > 0; j--){
-      for(int k = 0; k < (int)layers[j].neurons.size(); k++){
-        for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
-          batchWeightSum += layers[j].neurons[k].error * layers[j - 1].neurons[l].a;
-          if (k == 0 && l < 4)
-            printf("err=%e, a=%e\n", layers[j].neurons[k].error, layers[j-1].neurons[l].a);
-        }
-        batchBiasSum += layers[j].neurons[k].error;
-      }	
-    }
-    if(i % batchSize() == 0 && i != 0){
-      printf("Batch %d out of %d\n", i/5, (int)s->inputData->size() / 5);
-      for(int j = (int)layers.size() - 1; j > 0; j--){
-        for(int k = 0; k < (int)layers[j].neurons.size(); k++){
-          for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
-            layers[j].neurons[k].weights[l] -= (trainingConstant()/(double)batchSize()) * batchWeightSum;
-            if (k == 0 && l < 4)
-              printf("batchWeightSum=%e, d_w=%e\n", batchWeightSum,(trainingConstant()/(double)batchSize()) * batchWeightSum);
-	  }
-          layers[j].neurons[k].bias -= (trainingConstant()/(double)batchSize()) * batchBiasSum;
-        }
+    for(int lay = 0; lay < (int)layers.size(); lay++){
+      for(int neur = 0; neur < (int)layers[lay].neurons.size(); neur++){
+        printf("bias = %e, err = %e, z = %e, a = %e\n", layers[lay].neurons[neur].bias, layers[lay].neurons[neur].error, layers[lay].neurons[neur].z, layers[lay].neurons[neur].a);
       }
-      batchWeightSum = 0;
-      batchBiasSum = 0;
     }
+    // gradient decent (to modify biases and weights)
   }
 }
 
