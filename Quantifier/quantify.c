@@ -54,8 +54,8 @@ struct data_collection{
 
 struct data_collection* create_data(int num_arrays, int size){
 	struct data_collection *data_c = malloc(sizeof(struct data_collection));
-	int ***data = malloc(sizeof(int**) * num_arrays);
 	int *answers = malloc(sizeof(int) * num_arrays);
+	int ***data = malloc(sizeof(int**) * num_arrays);
 	for(int i = 0; i < num_arrays; i++){
 		data[i] = malloc(sizeof(int*) * size);
 		for(int j = 0; j < size; j++){
