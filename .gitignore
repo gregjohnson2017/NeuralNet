@@ -4,6 +4,7 @@ net
 makefile
 Makefile
 *.swp
+network.nn
 
 # Compiled source #
 ###################

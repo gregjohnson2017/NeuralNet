@@ -1,3 +1,4 @@
+#include "quantify.h"
 #include "gimage.h"
 #include <math.h>
 #include <stdlib.h>
@@ -5,9 +6,9 @@
 #include <string.h>
 
 int** getData(image *i, int size){
-	int **data = malloc(sizeof(int*) * size);
+	int **data = (int**)malloc(sizeof(int*) * size);
 	for(int i = 0; i < size; i++){
-		data[i] = malloc(sizeof(int) * size);
+		data[i] = (int*)malloc(sizeof(int) * size);
 	}
 	if(i->width != size || i->height != size) {
 		printf("Size is not %dx%d!\n", size, size);
@@ -48,18 +49,14 @@ int count_files(char *dir){
 	return count;
 }
 
-struct data_collection{
-	int ***data, *answers, num_arrays, size;
-};
-
 struct data_collection* create_data(int num_arrays, int size){
-	struct data_collection *data_c = malloc(sizeof(struct data_collection));
-	int *answers = malloc(sizeof(int) * num_arrays);
-	int ***data = malloc(sizeof(int**) * num_arrays);
+	struct data_collection *data_c = (struct data_collection*)malloc(sizeof(struct data_collection));
+	int ***data = (int***)malloc(sizeof(int**) * num_arrays);
+	int *answers = (int*)malloc(sizeof(int) * num_arrays);
 	for(int i = 0; i < num_arrays; i++){
-		data[i] = malloc(sizeof(int*) * size);
+		data[i] = (int**)malloc(sizeof(int*) * size);
 		for(int j = 0; j < size; j++){
-			data[i][j] = malloc(sizeof(int) * size);
+			data[i][j] = (int*)malloc(sizeof(int) * size);
 		}
 	}
 	data_c->data = data;
@@ -82,18 +79,24 @@ void destroy_data(struct data_collection *d){
 
 struct data_collection* read_data(char *data_file){
 	FILE *fp = fopen(data_file, "rb");
+	if(!fp){
+		fprintf(stderr, "FILE %s NOT FOUND\n", data_file);
+		abort();
+	}
 	int num_arrays, size;
-	fread(&num_arrays, sizeof(int), 1, fp);
-	fread(&size, sizeof(int), 1, fp);
+	size_t gcc = 0;
+	gcc += fread(&num_arrays, sizeof(int), 1, fp) * sizeof(int);
+	gcc += fread(&size, sizeof(int), 1, fp) * sizeof(int);
 	struct data_collection *data_c = create_data(num_arrays, size);
 	for(int i = 0; i < num_arrays; i++){
 		for(int j = 0; j < size; j++){
-			fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), size, fp);
+			gcc += fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), size, fp) * sizeof(*data_c->data[i][j]);
 		}
 		int answer;
-		fread(&answer, sizeof(int), 1, fp);
+		gcc += fread(&answer, sizeof(int), 1, fp) * sizeof(int); 
 		data_c->answers[i] = answer;
 	}
+	printf("Read %d arrays of size %d (%lu bytes) from %s\n", num_arrays, size, gcc, data_file); 
 	fclose(fp);
 	return data_c;
 }
@@ -115,7 +118,7 @@ void write_data(char *dir, int size, char *data_file){
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")){
 			continue;    /* skip self and parent */
 		}
-		char *path = malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
+		char *path = (char*)malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
 		sprintf(path, "%s/%s", dir, dp->d_name);
 		image *i = extract_from_png(path);
 		
@@ -159,14 +162,7 @@ void print_data(struct data_collection *d){
 	printf("End of file.\n");
 }
 
-int main(int argc, char **argv){
-	int size = 64;
-	write_data("/home/greg/Documents/NeuralNet/Quantifier/Samples", size, "nums.dat");
-	struct data_collection *d = read_data("nums.dat");
-	print_data(d);
-	destroy_data(d);
-	return 1;
-}
+
 
 
 

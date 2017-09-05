@@ -5,10 +5,13 @@
 using namespace std;
 class Layer{
 	public:
-		vector<Neuron*> neurons;
-		int nNeurons, nInputs;
-		vector<double> feedLayer(vector<double> &inputs), outputs;
+		vector<Neuron> neurons;
+		int nNeurons;
+		void feedLayer(vector<double> &inputs);
+		vector<double> getOutputs();
+		vector<double> outputs;
 		Layer(int nNeurons, int nInputs);
+		Layer(vector<Neuron> &neurons);
 		~Layer();
 };
 #endif

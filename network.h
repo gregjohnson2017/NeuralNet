@@ -1,20 +1,37 @@
 #ifndef NETWORK_H
 #define NETWORK_H
-#include "layer.h"
+#include <stdio.h>
 #include <vector>
+#include "layer.h"
 using namespace std;
+
+typedef struct samples{
+	vector<vector<double> > *inputData;
+	vector<double> *answers;
+	int sampleSize; // length of 1d array stretch before next sample
+	// ex 64x64 image: sampleSize = 4096
+} samples;
+
 class Network{
 	public:
+		int nLayers, nInputs, nOutputs;
 		Network(int nLayers, int nInputs, int nOutputs);
+		Network(vector<Layer> &layers, int nInputs, int nOutputs);
+		Network(const char *fileName);
 		~Network();
 		static double trainingConstant(){
-			return 1;
+			return 0.9;
 		}
-		int nLayers, nInputs, nOutputs;
-		vector<Layer*> layers;
-		vector<double> getOutputs(vector<double> &inputs);
-		void train(vector<double> &inputs, vector<double> &answers);
-		void backPropagate(vector<double> &weights, vector<double> &error, vector<double> &z);
+		static int batchSize(){
+			return 5;
+		}
+		vector<Layer> layers;
+		vector<double> getOutputs();
+		void train(samples *s);
+		void feedNetwork(vector<double> &inputs);
+		void backPropagate();
+		void computeOutputError(double answer);
+		void saveNetwork(const char *fileName);
 };
 #endif
 
