@@ -22,7 +22,7 @@ Neuron::Neuron(int nWeights){
   }
   error = 0;
   z = 0;
-  a = 123;
+  a = 0;
 }
 
 /*

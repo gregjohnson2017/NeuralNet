@@ -50,9 +50,12 @@ void Network::feedNetwork(vector<double> &inputs){
   if(inputs.size() != layers[0].neurons.size()) throw invalid_argument("inputs != input layer");
   for(int i = 0; i < nLayers; i++){
     vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
+    double totalError = 0;
     for(int j = 0; j < (int)layers[i].neurons.size(); j++){
+      totalError += layers[i].neurons[j].error;
       layers[i].neurons[j].feed(layerInputs);
     }
+    printf("Layer %d average error = %e\n", i, totalError / (double)layers[i].neurons.size());
     layerInputs.clear();
   }
 }
@@ -70,16 +73,52 @@ vector<double> Network::getOutputs(){
 comment me
 */
 void Network::train(samples *s){
+  vector<vector<double> > batchWeightSum;
+  vector<double> batchBiasSum;
   for(int i = 0; i < (int)s->inputData->size(); i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    for(int lay = 0; lay < (int)layers.size(); lay++){
-      for(int neur = 0; neur < (int)layers[lay].neurons.size(); neur++){
-        printf("bias = %e, err = %e, z = %e, a = %e\n", layers[lay].neurons[neur].bias, layers[lay].neurons[neur].error, layers[lay].neurons[neur].z, layers[lay].neurons[neur].a);
+    // gradient decent (to modify biases and weights)
+    if(i % batchSize() == 0){
+      if(i != 0){
+        printf("Batch %d/%d\n", i / batchSize(), (int)s->inputData->size() / batchSize());
+        for(int L = 1; L < (int)layers.size(); L++){
+          for(int N = 0; N < (int)layers[L].neurons.size(); N++){
+            for(int W = 0; W < (int)layers[L].neurons[N].weights.size(); W++){
+              if(W<10&&N<10){
+                printf("changing weight by %f\n", trainingConstant() * batchWeightSum[N][W] / (double)batchSize());
+                printf("new weight = %f\n", layers[L].neurons[N].weights[W] - trainingConstant() * batchWeightSum[N][W] / (double)batchSize());
+              }
+              layers[L].neurons[N].weights[W] -= trainingConstant() * batchWeightSum[N][W] / (double)batchSize();
+            }
+            layers[L].neurons[N].bias -= trainingConstant() * batchBiasSum[N] / (double)batchSize();
+          }
+        }
+        batchWeightSum.clear();
+        batchBiasSum.clear();
+      }
+      for(int L = 1; L < (int)layers.size(); L++){
+        for(int N = 0; N < (int)layers[L].neurons.size(); N++){
+          vector<double> weightRow;
+          for(int W = 0; W < (int)layers[L].neurons[N].weights.size(); W++){
+            weightRow.push_back(layers[L].neurons[N].error * layers[L - 1].neurons[W].a);
+          }
+          batchWeightSum.push_back(weightRow);
+          batchBiasSum.push_back(layers[L].neurons[N].error);
+        }
+      }
+    }else{
+      for(int L = 1; L < (int)layers.size(); L++){
+        for(int N = 0; N < (int)layers[L].neurons.size(); N++){
+          vector<double> weightRow;
+          for(int W = 0; W < (int)layers[L].neurons[N].weights.size(); W++){
+            batchWeightSum[N][W] += layers[L].neurons[N].error * layers[L - 1].neurons[W].a;
+          }
+          batchBiasSum[N] += layers[L].neurons[N].error;
+        }
       }
     }
-    // gradient decent (to modify biases and weights)
   }
 }
 
@@ -88,7 +127,8 @@ void Network::computeOutputError(double answer){
     double y = i == answer ? 1 : 0;
     Neuron *n = &(layers[layers.size() - 1].neurons[i]);
     n->error = (n->a - y) * sigmoid_prime(n->z);
-    //printf("compOutError neuron %d of layer %d: y=%e, n.a=%e, n.z=%e, error=%e\n", i, (int)(layers.size()-1), y, n->a, n->z, n->error);
+    printf("N%d error = %f\n", i, n->error);
+    printf("compOutError neuron %d of layer %d: y=%e, n.a=%e, n.z=%e, error=%e\n", i, (int)(layers.size()-1), y, n->a, n->z, n->error);
     //getchar();
   }
 }
@@ -106,14 +146,14 @@ void Network::backPropagate(){
       for(int k = 0; k < layers[l + 1].nNeurons; k++){
 	      double w = layers[l + 1].neurons[k].weights[j];
 	      double e = layers[l + 1].neurons[k].error;
-	      double z = layers[l].neurons[j].z;
-	      sum += w * e * sigmoid_prime(z);
+	      sum += w * e;
               //if (j < 50 && k < 50)
                 //printf("backProp layer=%d neuron_from=%d neuron_to=%d w=%e, e=%e, z=%e, number_to_sum=%e\n", l, j, k, w, e, z, w*e*sigmoid_prime(z));
               //getchar();
       }
       // set error for the neuron to sum
-      layers[l].neurons[j].error = sum;
+	    double z = layers[l].neurons[j].z;
+      layers[l].neurons[j].error = sum + sigmoid_prime(z);
       //if (j < 500)
         //printf("backProp neuron %d of layer %d: error=%e\n", j, l, sum);
     }
