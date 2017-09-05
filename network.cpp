@@ -126,7 +126,7 @@ void Network::computeOutputError(double answer){
   for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
     double y = i == answer ? 1 : 0;
     Neuron *n = &(layers[layers.size() - 1].neurons[i]);
-    n->error = (n->a - y) * sigmoid_prime(n->z);
+    n->error = abs((n->a - y) * sigmoid_prime(n->z));
     printf("N%d error = %f\n", i, n->error);
     printf("compOutError neuron %d of layer %d: y=%e, n.a=%e, n.z=%e, error=%e\n", i, (int)(layers.size()-1), y, n->a, n->z, n->error);
     //getchar();
