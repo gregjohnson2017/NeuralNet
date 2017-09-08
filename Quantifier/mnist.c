@@ -2,6 +2,9 @@
 #include "quantify.h"
 #include "gimage.h"
 #include <png.h>
+#include <byteswap.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	FILE *image_fp = fopen(image_file, "rb");
@@ -20,11 +23,20 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	image_gcc += fread(&image_count, sizeof(int), 1, image_fp) * sizeof(int);
 	image_gcc += fread(&image_rows, sizeof(int), 1, image_fp) * sizeof(int);
 	image_gcc += fread(&image_cols, sizeof(int), 1, image_fp) * sizeof(int);
+	// big endian -> host endian
+	image_magic = bswap_32(image_magic);
+	image_count = bswap_32(image_count);
+	image_rows = bswap_32(image_rows);
+	image_cols = bswap_32(image_cols);
 	int label_magic, label_count;
 	label_gcc += fread(&label_magic, sizeof(int), 1, label_fp) * sizeof(int);
 	label_gcc += fread(&label_count, sizeof(int), 1, label_fp) * sizeof(int);
+	// big endian -> host endian
+	label_magic = bswap_32(label_magic);
+	label_count = bswap_32(label_count);
 	printf("image count = %d rows = %d cols = %d\n", image_count, image_rows, image_cols);
-	printf();
+	printf("label count = %d\n", image_count);
+	getchar();
 	if(image_count != label_count){
 	  fprintf(stderr, "mismatched image and label count (%d and %d)\n", image_count, label_count);
 	}
@@ -42,7 +54,7 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 		printf("read image %d / %d\n", i, image_count);
 	}
 	printf("Read %d arrays of size %dx%d (%lu bytes) from %s\n", image_count, image_rows, image_cols,  image_gcc, image_file);
-		printf("Read %d labels (%lu bytes) from %s\n", label_count, label_gcc, label_file);
+	printf("Read %d labels (%lu bytes) from %s\n", label_count, label_gcc, label_file);
 	fclose(image_fp);
 	fclose(label_fp);
 	return data_c;
@@ -86,6 +98,7 @@ void generate_mnist_images(struct data_collection *m){
 	  image *i = create_image(m->size, m->size, new, row_pointers);
     i->px = new;
 	  char *filename = malloc(sizeof(char) * 60);
+	  mkdir("./Training_Samples", 0777);
 	  sprintf(filename, "./Training_Samples/training_sample%d_%u.png", pic, m->answers[pic]);
 	  write_to_png(i, filename);
 	  free(filename);
