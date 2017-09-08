@@ -8,16 +8,16 @@
 Layer::Layer(int nNeurons, int nInputs){
   this->nNeurons = nNeurons;
   for(int i = 0; i < nNeurons; i++){
-    neurons.push_back(Neuron(nInputs));
+    neurons.push_back(new Neuron(nInputs));
   }
 }
 
 /*
   Layer constructor for pre-defined layers. Used for loading networks.
 */
-Layer::Layer(vector<Neuron> &neurons){
-  this->nNeurons = neurons.size();
-  this->neurons = neurons;
+Layer::Layer(vector<Neuron*> *neurons){
+  this->nNeurons = neurons->size();
+  this->neurons = *neurons;
 }
 
 /*
@@ -25,14 +25,14 @@ Layer::Layer(vector<Neuron> &neurons){
 */
 void Layer::feedLayer(vector<double> &inputs){
   for(int i = 0; i < (int)neurons.size(); i++){
-    neurons[i].feed(inputs);
+    neurons[i]->feed(inputs);
   }
 }
 
 vector<double> Layer::getOutputs(){
   vector<double> outputs;
   for(int i = 0; i < nNeurons; i++){
-    outputs.push_back(neurons[i].a);
+    outputs.push_back(neurons[i]->a);
   }
   return outputs;
 }
@@ -41,6 +41,7 @@ vector<double> Layer::getOutputs(){
   Layer destructor
 */
 Layer::~Layer(){
+  printf("layer destroyed\n");
   neurons.clear();
 }
 

@@ -21,14 +21,14 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
     // if the layer is not the input layer, then the number of neurons in the layer
     // will depend on the number of inputs received from the previous layer
     // (i.e. number of neurons in the prevous layer)
-    layers.push_back(Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1].nNeurons));
+    layers.push_back(new Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1]->nNeurons));
   }
 }
 
 /*
   Network constructor used for loading pre-defined networks
 */
-Network::Network(vector<Layer> &layers, int nInputs, int nOutputs){
+Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
   this->nLayers = layers.size();
   this->nInputs = nInputs;
   this->nOutputs = nOutputs;
@@ -42,71 +42,119 @@ Network::~Network(){
   layers.clear();
 }
 
+void Network::printNetwork(){
+  printf("nLayers = %d, nInputs = %d, nOutputs = %d\n", nLayers, nInputs, nOutputs);
+}
+
 /*
   Completes one pass through the network, returning the outputs of the neurons
   in the final layer.
 */
 void Network::feedNetwork(vector<double> &inputs){
-  if(inputs.size() != layers[0].neurons.size()) throw invalid_argument("inputs != input layer");
+  if(inputs.size() != layers[0]->neurons.size()){
+    printf("inputs size = %d and input layer size = %d\n", (int)inputs.size(), (int)layers[0]->neurons.size());
+    throw invalid_argument("inputs != input layer");
+  }
   for(int i = 0; i < nLayers; i++){
-    vector<double> layerInputs = i == 0 ? inputs : layers[i - 1].getOutputs();
-    for(int j = 0; j < (int)layers[i].neurons.size(); j++){
-      layers[i].neurons[j].feed(layerInputs);
+    vector<double> layerInputs;
+    if(i == 0){
+        layerInputs = inputs;
+    }else{
+        layerInputs =  layers[i - 1]->getOutputs();
     }
+    for(int j = 0; j < (int)layers[i]->neurons.size(); j++){
+      layers[i]->neurons[j]->feed(layerInputs);
+    }
+//    printf("Layer %d average error = %e\n", i, totalError / (double)layers[i].neurons.size());
     layerInputs.clear();
   }
 }
 
 vector<double> Network::getOutputs(){
   vector<double> outputs;
-  for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
-    printf("adding %f to vector\n", layers[layers.size() - 1].neurons[i].a);
-    outputs.push_back(layers[layers.size() - 1].neurons[i].a);
+  for(int i = 0; i < (int)layers[layers.size() - 1]->neurons.size(); i++){
+    //printf("adding %f to vector\n", layers[layers.size() - 1].neurons[i].a);
+    outputs.push_back(layers[layers.size() - 1]->neurons[i]->a);
   }
   return outputs;
 }
 
 /*
 comment me
-*/	
+*/
 void Network::train(samples *s){
-  double batchWeightSum = 0;
-  double batchBiasSum = 0;
+  vector<vector<double> > batchWeightSum;
+  vector<double> batchBiasSum;
   for(int i = 0; i < (int)s->inputData->size(); i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    
-    // gradient decent (to modify biases and weights)
-    for(int j = 1; j < (int)layers.size(); j++){
-      for(int k = 0; k < (int)layers[j].neurons.size(); k++){
-        for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
-          batchWeightSum += layers[j].neurons[k].error * layers[j - 1].neurons[l].a;
-        }
-        batchBiasSum += layers[j].neurons[k].error;
-      }	
-    }
-    if(i % Network::batchSize() == 0){
-      printf("Batch %d out of %d\n", i/5, (int)s->inputData->size() / 5);
-      for(int j = 1; j < (int)layers.size(); j++){
-        for(int k = 0; k < (int)layers[j].neurons.size(); k++){
-          for(int l = 0; l < (int)layers[j].neurons[k].weights.size(); l++){
-            layers[j].neurons[k].weights[l] -= (trainingConstant()/batchSize()) * batchWeightSum;
-          }
-          layers[j].neurons[k].bias -= (trainingConstant()/batchSize()) * batchBiasSum;
+    /*for(int L = 1; L < (int)layers.size() - 1; L++){
+      for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
+        for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
+          double delta = -1 * trainingConstant() * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
+          layers[L]->neurons[N]->weights[W] += delta;
         }
       }
-      batchWeightSum = 0;
-      batchBiasSum = 0;
+    }*/
+    
+    
+    // gradient decent (to modify biases and weights)
+    if(i % batchSize() == 0){
+      if(i != 0){
+        printf("Batch %d/%d\n", i / batchSize(), (int)s->inputData->size() / batchSize());
+        for(int L = 1; L < (int)layers.size(); L++){
+          for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
+            for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
+              layers[L]->neurons[N]->weights[W] -= trainingConstant() * batchWeightSum[N][W] / (double)batchSize();
+            }
+            layers[L]->neurons[N]->bias -= trainingConstant() * batchBiasSum[N] / (double)batchSize();
+          }
+        }
+        batchWeightSum.clear();
+        batchBiasSum.clear();
+      }
+      for(int L = 1; L < (int)layers.size(); L++){
+        for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
+          vector<double> weightRow;
+          for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
+            weightRow.push_back(layers[L]->neurons[N]->error * layers[L - 1]->neurons[W]->a);
+          }
+          batchWeightSum.push_back(weightRow);
+          batchBiasSum.push_back(layers[L]->neurons[N]->error);
+        }
+      }
+    }else{
+      for(int L = 1; L < (int)layers.size(); L++){
+        for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
+          vector<double> weightRow;
+          for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
+            batchWeightSum[N][W] += layers[L]->neurons[N]->error * layers[L - 1]->neurons[W]->a;
+          }
+          batchBiasSum[N] += layers[L]->neurons[N]->error;
+        }
+      }
     }
   }
 }
 
+/*
+This function should be unique to an implementation
+ -> should be specified by the user, not hard-coded here
+ 
+Assumes feedNetwork was already called, so the final
+neurons each have an output
+*/
 void Network::computeOutputError(double answer){
-  for(int i = 0; i < layers[layers.size() - 1].nNeurons; i++){
-    double y = i - 1 == answer ? 1 : 0;
-    Neuron n = layers[layers.size() - 1].neurons[i];
-    n.error = (n.a - y) * sigmoid_prime(n.z);
+  for(int i = 0; i < layers[layers.size() - 1]->nNeurons; i++){
+    double y = i == answer ? 1 : 0;
+    Neuron *n = layers[layers.size() - 1]->neurons[i]; // final neuron
+    //n->error = abs((n->a - y) * sigmoid_prime(n->z));
+    //wikipedia approach:
+    n->error = (n->a - y) * n->a * (1 - n->a);
+    //printf("N%d error = %f\n", i, n->error);
+    //printf("compOutError neuron %d of layer %d: y=%e, n.a=%e, n.z=%e, error=%e\n", i, (int)(layers.size()-1), y, n->a, n->z, n->error);
+    //getchar();
   }
 }
 
@@ -117,17 +165,19 @@ void Network::backPropagate(){
   // loop through layers l = L-1, L-2, ..., 2
   for(int l = nLayers - 2; l >= 1; l--){ // L-1 <=> nLayers - 2; 2 <=> 1
     // loop through neurons j in layer l
-    for(int j = 0; j < layers[l].nNeurons; j++){
+    for(int j = 0; j < layers[l]->nNeurons; j++){
       double sum = 0;
       // loop through neurons k in layer l+1
-      for(int k = 0; k < layers[l + 1].nNeurons; k++){
-	      double w = layers[l + 1].neurons[k].weights[j];
-	      double e = layers[l + 1].neurons[k].error;
-	      double z = layers[l].neurons[j].z;
-	      sum += w * e * sigmoid_prime(z);
-	      // set error for the neuron to sum
-	      layers[l].neurons[j].error = sum;
+      for(int k = 0; k < (int)layers[l + 1]->neurons.size(); k++){
+	      double w = layers[l + 1]->neurons[k]->weights[j];
+	      double e = layers[l + 1]->neurons[k]->error;
+	      sum += w * e;
       }
+      // set error for the neuron to sum
+	  //double z = layers[l].neurons[j].z;
+      //layers[l].neurons[j].error = sum * sigmoid_prime(z);
+  	  double z = layers[l]->neurons[j]->z;
+      layers[l]->neurons[j]->error = abs(sum * sigmoid_prime(z));
     }
   }
 }
@@ -156,14 +206,14 @@ void Network::saveNetwork(const char *fileName){
   fwrite(&nOutputs, sizeof(nOutputs), 1, fp);
   fwrite(&nLayers, sizeof(nLayers), 1, fp);
   for(int i = 0; i < nLayers; i++){
-    fwrite(&layers[i].nNeurons, sizeof(layers[i].nNeurons), 1, fp);
-    for(int j = 0; j < layers[i].nNeurons; j++){
-      int nWeights = layers[i].neurons[j].weights.size();
+    fwrite(&layers[i]->nNeurons, sizeof(layers[i]->nNeurons), 1, fp);
+    for(int j = 0; j < layers[i]->nNeurons; j++){
+      int nWeights = layers[i]->neurons[j]->weights.size();
       fwrite(&nWeights, sizeof(nWeights), 1, fp);
-      for(int k = 0; k < (int)layers[i].neurons[j].weights.size(); k++){
-	fwrite(&layers[i].neurons[j].weights[k], sizeof(layers[i].neurons[j].weights[k]), 1, fp);
+      for(int k = 0; k < (int)layers[i]->neurons[j]->weights.size(); k++){
+	fwrite(&layers[i]->neurons[j]->weights[k], sizeof(layers[i]->neurons[j]->weights[k]), 1, fp);
       }
-      fwrite(&layers[i].neurons[j].bias, sizeof(layers[i].neurons[j].bias), 1, fp);
+      fwrite(&layers[i]->neurons[j]->bias, sizeof(layers[i]->neurons[j]->bias), 1, fp);
     }
   }
   fclose(fp);
@@ -183,8 +233,12 @@ Network::Network(const char *fileName){
   gcc += fread(&nInputs, sizeof(int), 1, fp) * sizeof(int);
   gcc += fread(&nOutputs, sizeof(int), 1, fp) * sizeof(int);
   gcc += fread(&nLayers, sizeof(int), 1, fp) * sizeof(int);
+  printf("x=%dy=%dz=%d\n", nLayers, nInputs, nOutputs);
+  this->nLayers = nLayers;
+  this->nInputs = nInputs;
+  this->nOutputs = nOutputs;	
   for(int i = 0; i < nLayers; i++){
-    vector<Neuron> neurons;
+    vector<Neuron*> *neurons = new vector<Neuron*>();
     int nNeurons;
     gcc += fread(&nNeurons, sizeof(int), 1, fp) * sizeof(int);
     for(int j = 0; j < nNeurons; j++){
@@ -192,15 +246,15 @@ Network::Network(const char *fileName){
       int nWeights;
       gcc += fread(&nWeights, sizeof(int), 1, fp) * sizeof(int);
       for(int k = 0; k < nWeights; k++){
-	double weight;
-	gcc += fread(&weight, sizeof(double), 1, fp) * sizeof(double);
-	weights.push_back(weight);
+	      double weight;
+	      gcc += fread(&weight, sizeof(double), 1, fp) * sizeof(double);
+	      weights.push_back(weight);
       }
       double bias;
       gcc += fread(&bias, sizeof(double), 1, fp) * sizeof(double);
-      neurons.push_back(Neuron(weights, bias));
+      neurons->push_back(new Neuron(weights, bias));
     }
-    layers.push_back(Layer(neurons));
+    layers.push_back(new Layer(neurons));
   }
   printf("Loaded neural network from file %s with %d inputs %d outputs %d layers (read %lu bytes).\n", fileName, nInputs, nOutputs, nLayers, gcc);
 }

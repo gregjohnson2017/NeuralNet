@@ -1,23 +1,22 @@
 /* Adapted from Guillaume Cottenceau's and Yoshimasa Niwa's work */
 #include "gimage.h"
 #include <stdio.h>
-image* create_image(int width, int height, png_bytep *row_pointers){
+image* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers){
 	image *i = malloc(sizeof(image));
 	i->width = width;
 	i->height = height;
+	i->px = px;
 	i->row_pointers = row_pointers;
 	return i;
 }
 
-image* extract_from_png(char* filename){
+image* extract_from_png(const char* filename){
 	int width, height;
 	png_byte color_type, bit_depth;
 	png_bytep *row_pointers;
 	FILE *fp = fopen(filename, "rb");
-	if(!fp){
-		printf("Did not open correctly!!!\n");
-		return NULL;
-	}
+	if(!fp) return NULL;
+	
 	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if(!png) return NULL;
 	png_infop info = png_create_info_struct(png);
@@ -63,14 +62,28 @@ image* extract_from_png(char* filename){
 		row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png,info));
 	}
 	png_read_image(png, row_pointers);
-	
 	fclose(fp);
 	
-	image *image = create_image(width, height, row_pointers);
+	pxinfo **px = malloc(sizeof(pxinfo*) * height);
+	for(int i = 0; i < height; i++){
+		px[i] = malloc(sizeof(pxinfo) * width);
+	}
+	for(int y = 0; y < height; y++) {
+		png_bytep row = row_pointers[y];
+		for(int x = 0; x < width; x++) {
+			png_bytep data = &(row[x * 4]);
+			px[y][x].r = data[0];
+			px[y][x].g = data[1];
+			px[y][x].b = data[2];
+			px[y][x].a = data[3];
+			px[y][x].lum = 0.2126f * data[0] + 0.7152f * data[1] + 0.0722f * data[2];
+		}
+	}
+	image *image = create_image(width, height, px, row_pointers);
 	return image;
 }
 
-bool write_to_png(image* image, char* filename){
+bool write_to_png(image* image, const char* filename){
 	FILE *fp = fopen(filename, "wb");
 	if(!fp) return NULL;
 
@@ -95,14 +108,23 @@ bool write_to_png(image* image, char* filename){
 		PNG_FILTER_TYPE_DEFAULT
 	);
 	png_write_info(png, info);
-
+	for(int y = 0; y < image->height; y++) {
+		png_bytep row = image->row_pointers[y];
+		for(int x = 0; x < image->width; x++) {
+			png_bytep data = &(row[x * 4]);
+			data[0] = image->px[y][x].r;
+			data[1] = image->px[y][x].g;
+			data[2] = image->px[y][x].b;
+			data[3] = image->px[y][x].a;
+		}
+	}
 	png_write_image(png, image->row_pointers);
 	png_write_end(png, NULL);
 
 	for(int y = 0; y < image->height; y++) {
-		free(image->row_pointers[y]);
+		free(image->px[y]);
 	}
-	free(image->row_pointers);
+	free(image->px);
 	fclose(fp);
 	return true;
 }

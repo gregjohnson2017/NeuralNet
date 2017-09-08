@@ -51,12 +51,12 @@ int count_files(char *dir){
 
 struct data_collection* create_data(int num_arrays, int size){
 	struct data_collection *data_c = (struct data_collection*)malloc(sizeof(struct data_collection));
-	int ***data = (int***)malloc(sizeof(int**) * num_arrays);
-	int *answers = (int*)malloc(sizeof(int) * num_arrays);
+	unsigned char ***data = (unsigned char***)malloc(sizeof(unsigned char**) * num_arrays);
+	unsigned char *answers = (unsigned char*)malloc(sizeof(unsigned char) * num_arrays);
 	for(int i = 0; i < num_arrays; i++){
-		data[i] = (int**)malloc(sizeof(int*) * size);
+		data[i] = (unsigned char**)malloc(sizeof(unsigned char*) * size);
 		for(int j = 0; j < size; j++){
-			data[i][j] = (int*)malloc(sizeof(int) * size);
+			data[i][j] = (unsigned char*)malloc(sizeof(unsigned char) * size);
 		}
 	}
 	data_c->data = data;
