@@ -1,4 +1,7 @@
 #include "mnist.h"
+#include "quantify.h"
+#include "gimage.h"
+#include <png.h>
 
 struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	FILE *image_fp = fopen(image_file, "rb");
@@ -10,6 +13,7 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	  fprintf(stderr, "FILE %s NOT FOUND\n", label_file);
 		abort();
 	}
+	printf("files opened\n");
 	size_t image_gcc = 0, label_gcc = 0;
 	int image_magic, image_count, image_rows, image_cols;
 	image_gcc += fread(&image_magic, sizeof(int), 1, image_fp) * sizeof(int);
@@ -19,6 +23,8 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	int label_magic, label_count;
 	label_gcc += fread(&label_magic, sizeof(int), 1, label_fp) * sizeof(int);
 	label_gcc += fread(&label_count, sizeof(int), 1, label_fp) * sizeof(int);
+	printf("image count = %d rows = %d cols = %d\n", image_count, image_rows, image_cols);
+	printf();
 	if(image_count != label_count){
 	  fprintf(stderr, "mismatched image and label count (%d and %d)\n", image_count, label_count);
 	}
@@ -33,6 +39,7 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 		unsigned char answer;
 		label_gcc += fread(&answer, sizeof(unsigned char), 1, label_fp) * sizeof(unsigned char); 
 		data_c->answers[i] = answer;
+		printf("read image %d / %d\n", i, image_count);
 	}
 	printf("Read %d arrays of size %dx%d (%lu bytes) from %s\n", image_count, image_rows, image_cols,  image_gcc, image_file);
 		printf("Read %d labels (%lu bytes) from %s\n", label_count, label_gcc, label_file);
@@ -60,8 +67,8 @@ void write_mnist_data(struct data_collection *mnist_data, char *data_file){
 
 void generate_mnist_images(struct data_collection *m){
   pxinfo **new = malloc(sizeof(pxinfo*) * m->size);
-	for(int i = 0; i < src_img->height; i++){
-		new[i] = malloc(sizeof(pxinfo) * src_img->size);
+	for(int i = 0; i < m->size; i++){
+		new[i] = malloc(sizeof(pxinfo) * m->size);
 	}
 	for(int pic = 0; pic < m->num_arrays; pic++){
 	  for(int r = 0; r < m->size; r++){
@@ -72,9 +79,14 @@ void generate_mnist_images(struct data_collection *m){
 			  new[r][c].a = 255;
 	    }
 	  }
-	  image *i = create_image(m->size, m->size, new);
-	  char *filename = malloc(sizeof(char) * 25);
-	  sprintf(filename, "./Training_Samples/training_sample%d.png", pic);
+	  png_bytep *row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * m->size);
+	  for(int y = 0; y < m->size; y++) {
+		  row_pointers[y] = (png_byte*)malloc(sizeof(png_bytep) * m->size);
+	  }
+	  image *i = create_image(m->size, m->size, new, row_pointers);
+    i->px = new;
+	  char *filename = malloc(sizeof(char) * 60);
+	  sprintf(filename, "./Training_Samples/training_sample%d_%u.png", pic, m->answers[pic]);
 	  write_to_png(i, filename);
 	  free(filename);
 	  free(i);

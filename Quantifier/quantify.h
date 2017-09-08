@@ -4,7 +4,7 @@
 int** getData(image *i, int size);
 int count_files(char *dir);
 typedef struct data_collection{
-  unsigned char  ***data, *answers
+  unsigned char  ***data, *answers;
 	int num_arrays, size;
 } data_collection;
 struct data_collection* create_data(int num_arrays, int size);
