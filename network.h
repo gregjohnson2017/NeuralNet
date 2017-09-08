@@ -16,20 +16,21 @@ class Network{
 	public:
 		int nLayers, nInputs, nOutputs;
 		Network(int nLayers, int nInputs, int nOutputs);
-		Network(vector<Layer> &layers, int nInputs, int nOutputs);
+		Network(vector<Layer*> &layers, int nInputs, int nOutputs);
 		Network(const char *fileName);
 		~Network();
 		static double trainingConstant(){
-			return 0.9;
+			return 0.1;
 		}
 		static int batchSize(){
 			return 5;
 		}
-		vector<Layer> layers;
+		vector<Layer*> layers;
 		vector<double> getOutputs();
 		void train(samples *s);
 		void feedNetwork(vector<double> &inputs);
 		void backPropagate();
+		void printNetwork();
 		void computeOutputError(double answer);
 		void saveNetwork(const char *fileName);
 };

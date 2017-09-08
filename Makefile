@@ -28,4 +28,4 @@ net: utils.o network.o layer.o neuron.o ./Quantifier/quantify.o ./Quantifier/gim
 	$(CXX) $(CXXFLAGS) neuron.o layer.o network.o ./Quantifier/quantify.o ./Quantifier/gimage.o utils.o main.cpp -o net -lpng -lz
 
 clean:
-	rm -f *.o net && make -C Quantifier clean
+	rm -f *.o *.nn net && make -C Quantifier clean

@@ -17,7 +17,7 @@
 Neuron::Neuron(int nWeights){
   bias = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
   for(int i = 0; i < nWeights; i++){
-    double w = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
+    double w = rand()/(double)RAND_MAX* 2 - 1; // -1 to 1 non-inclusive
     weights.push_back(w);
   }
   error = 0;
@@ -32,12 +32,16 @@ Neuron::Neuron(int nWeights){
 Neuron::Neuron(vector<double> &weights, double bias){
   this->weights = weights;
   this->bias = bias;
+  error = 0;
+  z = 1337;
+  a = 0;
 }
 
 /*
   Neuron destructor method.
 */	
 Neuron::~Neuron(){
+  printf("neuron destroyed\n");
   weights.clear();
 }
 /*
@@ -46,8 +50,9 @@ Neuron::~Neuron(){
   Sums the products of all inputs and their respective weights plus bias.
 */
 void Neuron::feed(vector<double> &inputs){
+  //printf("feed called on neuron\n");
   if(inputs.size() != weights.size()){
-    fprintf(stderr, "neuron.cpp:47 Mismatched inputs and weights expected %lu inputs but got %lu!\n", weights.size(), inputs.size());
+    fprintf(stderr, "Mismatched inputs and weights expected %lu inputs but got %lu!\n", weights.size(), inputs.size());
     throw std::invalid_argument("mismatched inputs and weights");
   }
   double sum = 0;
