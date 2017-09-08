@@ -57,3 +57,27 @@ void write_mnist_data(struct data_collection *mnist_data, char *data_file){
   }
   fclose(fp);
 }
+
+void generate_mnist_images(struct data_collection *m){
+  pxinfo **new = malloc(sizeof(pxinfo*) * m->size);
+	for(int i = 0; i < src_img->height; i++){
+		new[i] = malloc(sizeof(pxinfo) * src_img->size);
+	}
+	for(int pic = 0; pic < m->num_arrays; pic++){
+	  for(int r = 0; r < m->size; r++){
+	    for(int c = 0; c < m->size; c++){
+	      new[r][c].r = m->data[pic][r][c];
+			  new[r][c].g = m->data[pic][r][c];
+			  new[r][c].b = m->data[pic][r][c];
+			  new[r][c].a = 255;
+	    }
+	  }
+	  image *i = create_image(m->size, m->size, new);
+	  char *filename = malloc(sizeof(char) * 25);
+	  sprintf(filename, "./Training_Samples/training_sample%d.png", pic);
+	  write_to_png(i, filename);
+	  free(filename);
+	  free(i);
+	}
+	
+}
