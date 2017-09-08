@@ -20,10 +20,10 @@ class Network{
 		Network(const char *fileName);
 		~Network();
 		static double trainingConstant(){
-			return 0.1;
+			return 1;
 		}
 		static int batchSize(){
-			return 5;
+			return 50;
 		}
 		vector<Layer*> layers;
 		vector<double> getOutputs();

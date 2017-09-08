@@ -67,6 +67,8 @@ struct data_collection* create_data(int num_arrays, int size){
 }
 
 void destroy_data(struct data_collection *d){
+  printf("data destroyed\n");
+  abort();
 	free(d->answers);
 	for(int i = 0; i < d->num_arrays; i++){
 		for(int j = 0; j < d->size; j++){

@@ -58,7 +58,7 @@ int main(int argc, char **argv){
     }
     printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
   }else{
-    Network *n = new Network(5, 4096, 10);
+    Network *n = new Network(5, 28*28, 10);
     samples *s = getSamples("./Quantifier/nums.dat");
     n->train(s);
     n->saveNetwork("network.nn");
@@ -139,7 +139,7 @@ samples* getSamples(const char *fileName){
     vector<double> sample;
     for(int j = 0; j < d->size; j++){
       for(int k = 0; k < d->size; k++){
-	      sample.push_back((double)d->data[i][j][k]);
+	      sample.push_back((double)d->data[i][j][k]/255.0);
       }
     }
     data->push_back(sample);

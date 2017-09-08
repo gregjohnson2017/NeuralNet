@@ -85,24 +85,25 @@ void generate_mnist_images(struct data_collection *m){
 	for(int pic = 0; pic < m->num_arrays; pic++){
 	  for(int r = 0; r < m->size; r++){
 	    for(int c = 0; c < m->size; c++){
-	      new[r][c].r = m->data[pic][r][c];
-			  new[r][c].g = m->data[pic][r][c];
-			  new[r][c].b = m->data[pic][r][c];
+	      new[r][c].r = 255 - m->data[pic][r][c];
+			  new[r][c].g = 255 - m->data[pic][r][c];
+			  new[r][c].b = 255 - m->data[pic][r][c];
 			  new[r][c].a = 255;
 	    }
 	  }
-	  png_bytep *row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * m->size);
-	  for(int y = 0; y < m->size; y++) {
-		  row_pointers[y] = (png_byte*)malloc(sizeof(png_bytep) * m->size);
+	  
+	  char *template_filename = "template.png";
+	  image *i;
+	  if(!(i = extract_from_png(template_filename))){
+		  fprintf(stderr, "CANNOT READ FILE %s\n", template_filename);
 	  }
-	  image *i = create_image(m->size, m->size, new, row_pointers);
     i->px = new;
 	  char *filename = malloc(sizeof(char) * 60);
 	  mkdir("./Training_Samples", 0777);
 	  sprintf(filename, "./Training_Samples/training_sample%d_%u.png", pic, m->answers[pic]);
 	  write_to_png(i, filename);
-	  free(filename);
-	  free(i);
+	  //free(filename);
+	  //free(i);
 	}
 	
 }
