@@ -89,18 +89,18 @@ void Network::train(samples *s){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    /*for(int L = 1; L < (int)layers.size() - 1; L++){
+    for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
           double delta = -1 * trainingConstant() * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
           layers[L]->neurons[N]->weights[W] += delta;
         }
       }
-    }*/
+    }
     
     
     // gradient decent (to modify biases and weights)
-    if(i % batchSize() == 0){
+    /*if(i % batchSize() == 0){
       if(i != 0){
         printf("Batch %d/%d\n", i / batchSize(), (int)s->inputData->size() / batchSize());
         for(int L = 1; L < (int)layers.size(); L++){
@@ -134,7 +134,7 @@ void Network::train(samples *s){
           batchBiasSum[N] += layers[L]->neurons[N]->error;
         }
       }
-    }
+    }*/
   }
 }
 
@@ -176,8 +176,10 @@ void Network::backPropagate(){
       // set error for the neuron to sum
 	  //double z = layers[l].neurons[j].z;
       //layers[l].neurons[j].error = sum * sigmoid_prime(z);
-  	  double z = layers[l]->neurons[j]->z;
-      layers[l]->neurons[j]->error = abs(sum * sigmoid_prime(z));
+  	  //double z = layers[l]->neurons[j]->z;
+  	  double a = layers[l]->neurons[j]->a;
+//      layers[l]->neurons[j]->error = abs(sum * sigmoid_prime(z));
+      layers[l]->neurons[j]->error = sum * a * (1 - a);
     }
   }
 }
