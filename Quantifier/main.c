@@ -10,10 +10,11 @@ int main(int argc, char **argv){
 	
 	// new MNIST section
 	
-	struct data_collection *training = read_mnist_data("train-images.idx3-ubyte", "train-labels.idx1-ubyte");
+	//struct data_collection *training = read_mnist_data("train-images.idx3-ubyte", "train-labels.idx1-ubyte");
+	struct data_collection *training = read_mnist_data("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte");
 	printf("read training data\nenter to continue\n");
 	getchar();
-	write_mnist_data(training, "nums.dat");
-	generate_mnist_images(training);
+	write_mnist_data(training, "nums2.dat");
+	//generate_mnist_images(training);
 	return 1;
 }
