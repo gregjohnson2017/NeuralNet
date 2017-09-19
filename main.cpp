@@ -23,75 +23,28 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  if(atoi(argv[1])){
-    Network *n = new Network("network.nn");
-    //printf("Network Loaded: information\n");
-    //n->printNetwork();
-    
-    samples *s = getSamples("./Quantifier/nums2.dat");
-    double numCorrect = 0;
-    for(int i = 0; i < (int)s->inputData->size(); i++){
-      //printf("feeding network sample %d\n", i);
-      n->feedNetwork(s->inputData->at(i));
-      //printSample(s->inputData->at(i));
-      //printf("answer = %f\n", s->answers->at(i));
-      vector<double> outputs = n->getOutputs();
-      double highestOutput = outputs[0], guess = 0;
-      for(int j = 0; j < (int)outputs.size(); j++){
-        if(outputs[j] > highestOutput){
-          guess = j;
-          highestOutput = outputs[j];
-        }
-        //printf("N%d=%f\n", j, outputs[j]);
+  Network *n = new Network(15, 28*28, 10);
+  samples *sT = getSamples("./Quantifier/training.dat");
+  n->train(sT);
+  samples *s = getSamples("./Quantifier/testing.dat");
+  double numCorrect = 0;
+  for(int i = 0; i < (int)s->inputData->size(); i++){
+    n->feedNetwork(s->inputData->at(i));
+    vector<double> outputs = n->getOutputs();
+    double highestOutput = outputs[0], guess = 0;
+    for(int j = 0; j < (int)outputs.size(); j++){
+      if(outputs[j] > highestOutput){
+        guess = j;
+        highestOutput = outputs[j];
       }
-      if(s->answers->at(i) == guess){
-        //printf("Correct! Answer: %f, Guess: %f\n", (double)s->answers->at(i), (double)guess);
-        //getchar();
-        numCorrect++;
-      }
-      //printHighestLayerZ(n);
-      //printAverageLayerZ(n);
-      //printAverageLayerWeights(n);
-      //printAverageLayerActivation(n);
-      outputs.clear();
-      //getchar();
     }
-    printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
-  }else{
-    Network *n = new Network(15, 28*28, 10);
-    samples *sT = getSamples("./Quantifier/nums.dat");
-    n->train(sT);
-    samples *s = getSamples("./Quantifier/nums2.dat");
-    double numCorrect = 0;
-    for(int i = 0; i < (int)s->inputData->size(); i++){
-      //printf("feeding network sample %d\n", i);
-      n->feedNetwork(s->inputData->at(i));
-      //printSample(s->inputData->at(i));
-      //printf("answer = %f\n", s->answers->at(i));
-      vector<double> outputs = n->getOutputs();
-      double highestOutput = outputs[0], guess = 0;
-      for(int j = 0; j < (int)outputs.size(); j++){
-        if(outputs[j] > highestOutput){
-          guess = j;
-          highestOutput = outputs[j];
-        }
-        //printf("N%d=%f\n", j, outputs[j]);
-      }
-      if(s->answers->at(i) == guess){
-        //printf("Correct! Answer: %f, Guess: %f\n", (double)s->answers->at(i), (double)guess);
-        //getchar();
-        numCorrect++;
-      }
-      //printHighestLayerZ(n);
-      //printAverageLayerZ(n);
-      //printAverageLayerWeights(n);
-      //printAverageLayerActivation(n);
-      outputs.clear();
-      //getchar();
+    if(s->answers->at(i) == guess){
+      numCorrect++;
     }
-    printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
-    n->saveNetwork("network.nn");
+    outputs.clear();
   }
+  printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
+  n->saveNetwork("network.nn");
   return 1;
 }
 
