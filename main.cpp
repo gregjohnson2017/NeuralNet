@@ -28,13 +28,13 @@ int main(int argc, char **argv){
     //printf("Network Loaded: information\n");
     //n->printNetwork();
     
-    samples *s = getSamples("./Quantifier/nums.dat");
+    samples *s = getSamples("./Quantifier/nums2.dat");
     double numCorrect = 0;
+    int zeroAns = 0, zeroGuess = 0;
     for(int i = 0; i < (int)s->inputData->size(); i++){
+    
       //printf("feeding network sample %d\n", i);
       n->feedNetwork(s->inputData->at(i));
-      //printSample(s->inputData->at(i));
-      //printf("answer = %f\n", s->answers->at(i));
       vector<double> outputs = n->getOutputs();
       double highestOutput = outputs[0], guess = 0;
       for(int j = 0; j < (int)outputs.size(); j++){
@@ -44,9 +44,11 @@ int main(int argc, char **argv){
         }
         //printf("N%d=%f\n", j, outputs[j]);
       }
+      if(s->answers->at(i) == 0) zeroAns++;
+      if(guess == 0) zeroGuess++;
       if(s->answers->at(i) == guess){
+        //printSample(s->inputData->at(i));
         //printf("Correct! Answer: %f, Guess: %f\n", (double)s->answers->at(i), (double)guess);
-        //getchar();
         numCorrect++;
       }
       //printHighestLayerZ(n);
@@ -56,11 +58,14 @@ int main(int argc, char **argv){
       outputs.clear();
       //getchar();
     }
-    printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
+    printf("Zeros = %d Zeroguesses = %d\n", zeroAns, zeroGuess);
+    printf("%f%% correct\n", numCorrect * 100.0 / (double) s->inputData->size());
   }else{
     Network *n = new Network(5, 28*28, 10);
     samples *s = getSamples("./Quantifier/nums.dat");
-    n->train(s);
+    for(int aaaa = 0; aaaa< 1; aaaa++){
+      n->train(s);
+    }
     n->saveNetwork("network.nn");
   }
   return 1;
@@ -123,8 +128,8 @@ void printHighestLayerZ(Network *n){
 
 void printSample(vector<double> sample){
   for(int i = 0; i < (int)sample.size(); i++){
-    printf("%d, ", (int)sample[i]);
-    if((i%64==0 && i != 0) || i == (int)sample.size() - 1){
+    printf("%f, ", (double)sample[i]);
+    if((i%28==0 && i != 0) || i == (int)sample.size() - 1){
       printf("\n");
     }
   }
@@ -135,6 +140,7 @@ samples* getSamples(const char *fileName){
   samples *s = (samples*)malloc(sizeof(samples));
   vector<vector<double> > *data = new vector<vector<double> >();
   vector<double> *answers = new vector<double>();
+  int total = 0;
   for(int i = 0; i < d->num_arrays; i++){
     vector<double> sample;
     for(int j = 0; j < d->size; j++){
@@ -144,7 +150,10 @@ samples* getSamples(const char *fileName){
     }
     data->push_back(sample);
     answers->push_back((double)d->answers[i]);
+    if((double)d->answers[i]==0) total++;
   }
+  printf("total = %d\n", total);
+  getchar();
   s->inputData = data;
   s->sampleSize = d->size * d->size;
   s->answers = answers;

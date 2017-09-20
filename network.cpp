@@ -16,7 +16,7 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
     int neuronsPerLayer; 
     if(i == 0) neuronsPerLayer = nInputs; // input layer
     else if(i == nLayers - 1) neuronsPerLayer = nOutputs; // output layer
-    else neuronsPerLayer = (nInputs + nOutputs) / 2; // hidden layer (default size)
+    else neuronsPerLayer = (nInputs + nOutputs) / (2); // hidden layer (default size)
     
     // if the layer is not the input layer, then the number of neurons in the layer
     // will depend on the number of inputs received from the previous layer
@@ -86,20 +86,21 @@ void Network::train(samples *s){
   vector<vector<double> > batchWeightSum;
   vector<double> batchBiasSum;
   for(int i = 0; i < (int)s->inputData->size(); i++){
+    printf("sample %d\n", i);
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    /*for(int L = 1; L < (int)layers.size() - 1; L++){
+    for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
           double delta = -1 * trainingConstant() * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
           layers[L]->neurons[N]->weights[W] += delta;
         }
       }
-    }*/
+    }
     
     
-    // gradient decent (to modify biases and weights)
+    // gradient descent (to modify biases and weights)
     if(i % batchSize() == 0){
       if(i != 0){
         printf("Batch %d/%d\n", i / batchSize(), (int)s->inputData->size() / batchSize());

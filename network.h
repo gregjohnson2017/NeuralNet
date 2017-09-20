@@ -23,7 +23,7 @@ class Network{
 			return 1;
 		}
 		static int batchSize(){
-			return 50;
+			return 10;
 		}
 		vector<Layer*> layers;
 		vector<double> getOutputs();

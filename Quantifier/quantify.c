@@ -90,14 +90,17 @@ struct data_collection* read_data(char *data_file){
 	gcc += fread(&num_arrays, sizeof(int), 1, fp) * sizeof(int);
 	gcc += fread(&size, sizeof(int), 1, fp) * sizeof(int);
 	struct data_collection *data_c = create_data(num_arrays, size);
+	int total = 0;
 	for(int i = 0; i < num_arrays; i++){
 		for(int j = 0; j < size; j++){
 			gcc += fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), size, fp) * sizeof(*data_c->data[i][j]);
 		}
 		int answer;
-		gcc += fread(&answer, sizeof(int), 1, fp) * sizeof(int); 
+		gcc += fread(&answer, sizeof(unsigned char), 1, fp) * sizeof(unsigned char); 
 		data_c->answers[i] = answer;
+		if(answer == 0) total++;
 	}
+	printf("read total = %d\n", total);
 	printf("Read %d arrays of size %d (%lu bytes) from %s\n", num_arrays, size, gcc, data_file); 
 	fclose(fp);
 	return data_c;
