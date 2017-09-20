@@ -82,7 +82,7 @@ vector<double> Network::getOutputs(){
 /*
 comment me
 */
-void Network::train(sampleSet *s){
+void Network::train(sampleSet *s, double trainingConstant){
   vector<vector<double> > batchWeightSum;
   vector<double> batchBiasSum;
   for(int i = 0; i < (int)s->inputData->size(); i++){
@@ -94,8 +94,8 @@ void Network::train(sampleSet *s){
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
-          double delta = -1 * trainingConstant() * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
-          layers[L]->neurons[N]->weights[W] += delta;
+          double deltaW = -1 * trainingConstant * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
+          layers[L]->neurons[N]->weights[W] += deltaW;
         }
       }
     }

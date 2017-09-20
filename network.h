@@ -20,14 +20,14 @@ class Network{
 		Network(const char *fileName);
 		~Network();
 		static double trainingConstant(){
-			return 0.1;
+			return 0.3;
 		}
 		static int batchSize(){
 			return 25;
 		}
 		vector<Layer*> layers;
 		vector<double> getOutputs();
-		void train(sampleSet *s);
+		void train(sampleSet *s, double trainingConstant);
 		void feedNetwork(vector<double> &inputs);
 		void backPropagate();
 		void printNetwork();

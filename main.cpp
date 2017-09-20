@@ -19,54 +19,46 @@ void printAverageLayerZ(Network*);
 void printAverageLayerActivation(Network*);
 void printAverageLayerWeights(Network *n);
 void printAverageLayerError(Network *n);
+void trainNetwork(Network *n, const char *trainingData);
+void testNetwork(Network *n, const char *testingData);
 using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  
-  Network *n = new Network("network.nn");
-  sampleSet *testing = getSamples("./Quantifier/training.dat");
-  double numCorrect = 0;
-  for(int i = 0; i < (int)testing->inputData->size(); i++){
-    n->feedNetwork(testing->inputData->at(i));
-    vector<double> outputs = n->getOutputs();
-    double highestOutput = outputs[0], guess = 0;
-    for(int j = 0; j < (int)outputs.size(); j++){
-      if(outputs[j] > highestOutput){
-        guess = j;
-        highestOutput = outputs[j];
-      }
-    }
-    if(testing->answers->at(i) == guess){
-      numCorrect++;
-    }
-    outputs.clear();
-  }
-  printf("%f%% correct\n", numCorrect * 100 / (double) testing->inputData->size());
-  
-  /*Network *n = new Network(5, 28*28, 10);
-  sampleSet *training = getSamples("./Quantifier/training.dat");
-  n->train(training);
-  sampleSet *testing = getSamples("./Quantifier/testing.dat");
-  double numCorrect = 0;
-  for(int i = 0; i < (int)testing->inputData->size(); i++){
-    n->feedNetwork(testing->inputData->at(i));
-    vector<double> outputs = n->getOutputs();
-    double highestOutput = outputs[0], guess = 0;
-    for(int j = 0; j < (int)outputs.size(); j++){
-      if(outputs[j] > highestOutput){
-        guess = j;
-        highestOutput = outputs[j];
-      }
-    }
-    if(testing->answers->at(i) == guess){
-      numCorrect++;
-    }
-    outputs.clear();
-  }
-  printf("%f%% correct\n", numCorrect * 100 / (double) testing->inputData->size());
-  n->saveNetwork("network.nn");*/
+  Network *n = new Network(4, 28*28, 10);
+  trainNetwork(n, "./Quantifier/training.dat");
+  testNetwork(n, "./Quantifier/testing.dat");
+  n->saveNetwork("network10set.nn");
   return 1;
+}
+
+void trainNetwork(Network *n, const char *trainingData){
+  sampleSet *training = getSamples(trainingData);
+  for(int i = 0; i < 10; i++){
+    n->train(training, 2.65 - 0.2 * i);
+  }
+}
+
+void testNetwork(Network *n, const char *testingData){
+  sampleSet *testing = getSamples(testingData);
+  double numCorrect = 0;
+  for(int i = 0; i < (int)testing->inputData->size(); i++){
+    n->feedNetwork(testing->inputData->at(i));
+    vector<double> outputs = n->getOutputs();
+    double highestOutput = outputs[0], guess = 0;
+    for(int j = 0; j < (int)outputs.size(); j++){
+      if(outputs[j] > highestOutput){
+        guess = j;
+        highestOutput = outputs[j];
+      }
+    }
+    if(testing->answers->at(i) == guess){
+      numCorrect++;
+    }
+    outputs.clear();
+  }
+  double PC = numCorrect * 100 / (double) testing->inputData->size();
+  printf("%f%% correct\n", PC);
 }
 
 void printAverageLayerWeights(Network *n){
@@ -151,7 +143,6 @@ sampleSet* getSamples(const char *fileName){
     if((double)d->answers[i]==0) total++;
   }
   printf("total = %d\n", total);
-  getchar();
   s->inputData = data;
   s->sampleSize = d->size * d->size;
   s->answers = answers;

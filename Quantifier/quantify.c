@@ -5,10 +5,10 @@
 #include <dirent.h>
 #include <string.h>
 
-int** getData(image *i, int size){
-	int **data = (int**)malloc(sizeof(int*) * size);
+unsigned char** getData(image *i, int size){
+	unsigned char **data = (unsigned char**)malloc(sizeof(unsigned char*) * size);
 	for(int i = 0; i < size; i++){
-		data[i] = (int*)malloc(sizeof(int) * size);
+		data[i] = (unsigned char*)malloc(sizeof(unsigned char) * size);
 	}
 	if(i->width != size || i->height != size) {
 		printf("Size is not %dx%d!\n", size, size);
@@ -17,12 +17,7 @@ int** getData(image *i, int size){
 	for(int y = 0; y < i->height; y++) {
 		for(int x = 0; x < i->width; x++) {
 			png_bytep px = &(i->row_pointers[y][(x) * 4]);
-			if(px[0] == 255 && px[1] == 255 && px[2] == 255){
-				data[y][x] = 0;
-			}else{
-				data[y][x] = 1;
-			}
-//			printf("r = %d, g = %d, b = %d, a = %d\n", px[0], px[1], px[2], px[3]);
+			data[y][x] = 255 - px[0];
 		}
 	}
 	return data;
@@ -128,12 +123,13 @@ void write_data(char *dir, int size, char *data_file){
 		image *i = extract_from_png(path);
 		
 		// write data
-		int **data = getData(i, size);
+		unsigned char **data = getData(i, size);
 		for(int i = 0; i < size; i++){
 			fwrite(data[i], sizeof(*data[i]), size, fp);
 		}
-		int answer = atoi(dp->d_name);
-		fwrite(&answer, sizeof(int), 1, fp);
+		unsigned char answer = atoi(dp->d_name);
+		printf("reading answer as %d\n", answer);
+		fwrite(&answer, sizeof(unsigned char), 1, fp);
 		
 		/* Freeing section */
 		for(int i = 0; i < size; i++){
@@ -157,7 +153,7 @@ void print_data(struct data_collection *d){
 				if(d->data[a][i][j] == 0){
 					printf(j == d->size - 1 ? "-}" : "-, ");
 				}else{
-					printf(j == d->size - 1 ? "%d}" : "%d, ", d->data[a][i][j]);
+					printf(j == d->size - 1 ? "X}" : "X, ");
 				}
 			}
 			printf("\n");
