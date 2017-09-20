@@ -12,7 +12,7 @@ extern "C" {
 #include "./Quantifier/quantify.h"
 }
 
-samples* getSamples(const char *fileName);
+sampleSet* getSamples(const char *fileName);
 void printSample(vector<double> sample);
 void printHighestLayerZ(Network*);
 void printAverageLayerZ(Network*);
@@ -23,13 +23,12 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  Network *n = new Network(15, 28*28, 10);
-  samples *sT = getSamples("./Quantifier/training.dat");
-  n->train(sT);
-  samples *s = getSamples("./Quantifier/testing.dat");
+  
+  Network *n = new Network("network.nn");
+  sampleSet *testing = getSamples("./Quantifier/training.dat");
   double numCorrect = 0;
-  for(int i = 0; i < (int)s->inputData->size(); i++){
-    n->feedNetwork(s->inputData->at(i));
+  for(int i = 0; i < (int)testing->inputData->size(); i++){
+    n->feedNetwork(testing->inputData->at(i));
     vector<double> outputs = n->getOutputs();
     double highestOutput = outputs[0], guess = 0;
     for(int j = 0; j < (int)outputs.size(); j++){
@@ -38,13 +37,35 @@ int main(int argc, char **argv){
         highestOutput = outputs[j];
       }
     }
-    if(s->answers->at(i) == guess){
+    if(testing->answers->at(i) == guess){
       numCorrect++;
     }
     outputs.clear();
   }
-  printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
-  n->saveNetwork("network.nn");
+  printf("%f%% correct\n", numCorrect * 100 / (double) testing->inputData->size());
+  
+  /*Network *n = new Network(5, 28*28, 10);
+  sampleSet *training = getSamples("./Quantifier/training.dat");
+  n->train(training);
+  sampleSet *testing = getSamples("./Quantifier/testing.dat");
+  double numCorrect = 0;
+  for(int i = 0; i < (int)testing->inputData->size(); i++){
+    n->feedNetwork(testing->inputData->at(i));
+    vector<double> outputs = n->getOutputs();
+    double highestOutput = outputs[0], guess = 0;
+    for(int j = 0; j < (int)outputs.size(); j++){
+      if(outputs[j] > highestOutput){
+        guess = j;
+        highestOutput = outputs[j];
+      }
+    }
+    if(testing->answers->at(i) == guess){
+      numCorrect++;
+    }
+    outputs.clear();
+  }
+  printf("%f%% correct\n", numCorrect * 100 / (double) testing->inputData->size());
+  n->saveNetwork("network.nn");*/
   return 1;
 }
 
@@ -112,9 +133,9 @@ void printSample(vector<double> sample){
   }
 }
 
-samples* getSamples(const char *fileName){
+sampleSet* getSamples(const char *fileName){
   data_collection *d = read_data((char*)fileName);
-  samples *s = (samples*)malloc(sizeof(samples));
+  sampleSet *s = (sampleSet*)malloc(sizeof(sampleSet));
   vector<vector<double> > *data = new vector<vector<double> >();
   vector<double> *answers = new vector<double>();
   int total = 0;

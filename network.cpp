@@ -82,7 +82,7 @@ vector<double> Network::getOutputs(){
 /*
 comment me
 */
-void Network::train(samples *s){
+void Network::train(sampleSet *s){
   vector<vector<double> > batchWeightSum;
   vector<double> batchBiasSum;
   for(int i = 0; i < (int)s->inputData->size(); i++){
