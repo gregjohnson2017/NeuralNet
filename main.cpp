@@ -23,51 +23,28 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  if(atoi(argv[1])){
-    Network *n = new Network("network.nn");
-    //printf("Network Loaded: information\n");
-    //n->printNetwork();
-    
-    samples *s = getSamples("./Quantifier/nums2.dat");
-    double numCorrect = 0;
-    int zeroAns = 0, zeroGuess = 0;
-    for(int i = 0; i < (int)s->inputData->size(); i++){
-    
-      //printf("feeding network sample %d\n", i);
-      n->feedNetwork(s->inputData->at(i));
-      vector<double> outputs = n->getOutputs();
-      double highestOutput = outputs[0], guess = 0;
-      for(int j = 0; j < (int)outputs.size(); j++){
-        if(outputs[j] > highestOutput){
-          guess = j;
-          highestOutput = outputs[j];
-        }
-        //printf("N%d=%f\n", j, outputs[j]);
+  Network *n = new Network(15, 28*28, 10);
+  samples *sT = getSamples("./Quantifier/training.dat");
+  n->train(sT);
+  samples *s = getSamples("./Quantifier/testing.dat");
+  double numCorrect = 0;
+  for(int i = 0; i < (int)s->inputData->size(); i++){
+    n->feedNetwork(s->inputData->at(i));
+    vector<double> outputs = n->getOutputs();
+    double highestOutput = outputs[0], guess = 0;
+    for(int j = 0; j < (int)outputs.size(); j++){
+      if(outputs[j] > highestOutput){
+        guess = j;
+        highestOutput = outputs[j];
       }
-      if(s->answers->at(i) == 0) zeroAns++;
-      if(guess == 0) zeroGuess++;
-      if(s->answers->at(i) == guess){
-        //printSample(s->inputData->at(i));
-        //printf("Correct! Answer: %f, Guess: %f\n", (double)s->answers->at(i), (double)guess);
-        numCorrect++;
-      }
-      //printHighestLayerZ(n);
-      //printAverageLayerZ(n);
-      //printAverageLayerWeights(n);
-      //printAverageLayerActivation(n);
-      outputs.clear();
-      //getchar();
     }
-    printf("Zeros = %d Zeroguesses = %d\n", zeroAns, zeroGuess);
-    printf("%f%% correct\n", numCorrect * 100.0 / (double) s->inputData->size());
-  }else{
-    Network *n = new Network(5, 28*28, 10);
-    samples *s = getSamples("./Quantifier/nums.dat");
-    for(int aaaa = 0; aaaa< 1; aaaa++){
-      n->train(s);
+    if(s->answers->at(i) == guess){
+      numCorrect++;
     }
-    n->saveNetwork("network.nn");
+    outputs.clear();
   }
+  printf("%f%% correct\n", numCorrect * 100 / (double) s->inputData->size());
+  n->saveNetwork("network.nn");
   return 1;
 }
 
