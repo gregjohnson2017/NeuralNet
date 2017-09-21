@@ -9,7 +9,7 @@ int getRandom(int min, int max){
 
 /*
 Returns the calculated sigmoid value 1/(1+e^-x)
-Range is -1 to 1 non-inclusive
+Range is 0 to 1 non-inclusive
 */
 double sigmoid(double x){
 	return 1 / (1 + exp(-1 * x));

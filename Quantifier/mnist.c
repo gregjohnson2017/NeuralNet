@@ -16,7 +16,6 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	  fprintf(stderr, "FILE %s NOT FOUND\n", label_file);
 		abort();
 	}
-	printf("files opened\n");
 	size_t image_gcc = 0, label_gcc = 0;
 	int image_magic, image_count, image_rows, image_cols;
 	image_gcc += fread(&image_magic, sizeof(int), 1, image_fp) * sizeof(int);
@@ -36,7 +35,6 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	label_count = bswap_32(label_count);
 	printf("image count = %d rows = %d cols = %d\n", image_count, image_rows, image_cols);
 	printf("label count = %d\n", image_count);
-	getchar();
 	if(image_count != label_count){
 	  fprintf(stderr, "mismatched image and label count (%d and %d)\n", image_count, label_count);
 	}
@@ -44,7 +42,6 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 	  fprintf(stderr, "image rows and cols not equal (%d and %d)\n", image_rows, image_cols);
 	}
 	struct data_collection *data_c = create_data(image_count, image_rows);
-	int totalZeros = 0;
 	for(int i = 0; i < image_count; i++){
 		for(int j = 0; j < image_rows; j++){
 			image_gcc += fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), image_cols, image_fp) * sizeof(*data_c->data[i][j]);
@@ -52,10 +49,8 @@ struct data_collection* read_mnist_data(char *image_file, char *label_file){
 		unsigned char answer;
 		label_gcc += fread(&answer, sizeof(unsigned char), 1, label_fp) * sizeof(unsigned char); 
 		data_c->answers[i] = answer;
-		if(answer == 0) totalZeros++;
-		printf("read image %d / %d\n", i, image_count);
+		//printf("read image %d / %d\n", i, image_count);
 	}
-	printf("total zeros ans = %d\n", totalZeros);
 	printf("Read %d arrays of size %dx%d (%lu bytes) from %s\n", image_count, image_rows, image_cols,  image_gcc, image_file);
 	printf("Read %d labels (%lu bytes) from %s\n", label_count, label_gcc, label_file);
 	fclose(image_fp);
