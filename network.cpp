@@ -90,14 +90,13 @@ vector<double> Network::getOutputs(){
 comment me
 */
 void Network::train(sampleSet *s, double trainingConstant){
-  vector<vector<double> > batchWeightSum;
-  vector<double> batchBiasSum;
   const double tc = -trainingConstant;
+
   for(int i = 0; i < (int)s->inputData->size(); i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    printf("sample %d / %d\n", i, (int)s->inputData->size());
+    //printf("sample %d / %d\n", i, (int)s->inputData->size());
     
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
@@ -108,6 +107,7 @@ void Network::train(sampleSet *s, double trainingConstant){
 	layers[L]->neurons[N]->bias += tc * layers[L]->neurons[N]->error;
       }
     }
+    
     
   }
 }
@@ -122,13 +122,8 @@ neurons each have an output
 void Network::computeOutputError(double answer){
   for(int i = 0; i < layers[layers.size() - 1]->nNeurons; i++){
     double y = i == answer ? 1 : 0;
-    Neuron *n = layers[layers.size() - 1]->neurons[i]; // final neuron
-    //n->error = abs((n->a - y) * sigmoid_prime(n->z));
-    //wikipedia approach:
+    Neuron *n = layers[layers.size() - 1]->neurons[i]; // final layer
     n->error = (n->a - y) * n->a * (1 - n->a);
-    //printf("N%d error = %f\n", i, n->error);
-    //printf("compOutError neuron %d of layer %d: y=%e, n.a=%e, n.z=%e, error=%e\n", i, (int)(layers.size()-1), y, n->a, n->z, n->error);
-    //getchar();
   }
 }
 
@@ -147,12 +142,7 @@ void Network::backPropagate(){
 	      double e = layers[l + 1]->neurons[k]->error;
 	      sum += w * e;
       }
-      // set error for the neuron to sum
-	  //double z = layers[l].neurons[j].z;
-      //layers[l].neurons[j].error = sum * sigmoid_prime(z);
-  	  //double z = layers[l]->neurons[j]->z;
   	  double a = layers[l]->neurons[j]->a;
-//      layers[l]->neurons[j]->error = abs(sum * sigmoid_prime(z));
       layers[l]->neurons[j]->error = sum * a * (1 - a);
     }
   }

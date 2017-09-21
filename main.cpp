@@ -19,27 +19,34 @@ void printAverageLayerZ(Network*);
 void printAverageLayerActivation(Network*);
 void printAverageLayerWeights(Network *n);
 void printAverageLayerError(Network *n);
-void trainNetwork(Network *n, const char *trainingData);
-void testNetwork(Network *n, const char *testingData);
+void trainNetwork(Network *n, const char *trainingData, double trainingConstant);
+double testNetwork(Network *n, const char *testingData);
 using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  Network *n = new Network(3, 28*28, 10);
-  trainNetwork(n, "./Quantifier/training.dat");
-  testNetwork(n, "./Quantifier/testing.dat");
-  n->saveNetwork("network10set.nn");
+  double bestPC = 0, bestTraining = 0;
+  for(double training = 0.15; training < 1.0; training += 0.05){
+    Network *n = new Network(3, 28*28, 10);
+    trainNetwork(n, "./Quantifier/training.dat", 0.15);
+    double PC = testNetwork(n, "./Quantifier/testing.dat");
+    if(PC > bestPC){
+      bestPC = PC;
+      bestTraining = training;
+      printf("New best PC = %f\n", bestPC);
+    }
+  }
+  printf("Best PC = %f, best training = %f\n", bestPC, bestTraining);
+  //n->saveNetwork("network10set.nn");
   return 1;
 }
 
-void trainNetwork(Network *n, const char *trainingData){
+void trainNetwork(Network *n, const char *trainingData, double trainingConstant){
   sampleSet *training = getSamples(trainingData);
-  for(int i = 0; i < 1; i++){
-    n->train(training, 0.65);//2.65 - 0.2 * i);
-  }
+  n->train(training, trainingConstant);
 }
 
-void testNetwork(Network *n, const char *testingData){
+double testNetwork(Network *n, const char *testingData){
   sampleSet *testing = getSamples(testingData);
   double numCorrect = 0;
   for(int i = 0; i < (int)testing->inputData->size(); i++){
@@ -59,6 +66,7 @@ void testNetwork(Network *n, const char *testingData){
   }
   double PC = numCorrect * 100 / (double) testing->inputData->size();
   printf("%f%% correct\n", PC);
+  return PC;
 }
 
 void printAverageLayerWeights(Network *n){
@@ -119,7 +127,7 @@ void printHighestLayerZ(Network *n){
 void printSample(vector<double> sample){
   for(int i = 0; i < (int)sample.size(); i++){
     printf("%f, ", (double)sample[i]);
-    if((i%28==0 && i != 0) || i == (int)sample.size() - 1){
+    if((i % 28 == 0 && i != 0) || i == (int)sample.size() - 1){
       printf("\n");
     }
   }
@@ -130,7 +138,6 @@ sampleSet* getSamples(const char *fileName){
   sampleSet *s = (sampleSet*)malloc(sizeof(sampleSet));
   vector<vector<double> > *data = new vector<vector<double> >();
   vector<double> *answers = new vector<double>();
-  int total = 0;
   for(int i = 0; i < d->num_arrays; i++){
     vector<double> sample;
     for(int j = 0; j < d->size; j++){
@@ -140,9 +147,7 @@ sampleSet* getSamples(const char *fileName){
     }
     data->push_back(sample);
     answers->push_back((double)d->answers[i]);
-    if((double)d->answers[i]==0) total++;
   }
-  printf("total = %d\n", total);
   s->inputData = data;
   s->sampleSize = d->size * d->size;
   s->answers = answers;
