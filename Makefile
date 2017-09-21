@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-Wall -Werror -g -O4
 
-all: net Quantifier/quantify pr
+all: net Quantifier/quantify
 
 Quantifier/quantify:
 	make -C Quantifier all
@@ -27,8 +27,8 @@ network.o: network.cpp network.h utils.h
 net: utils.o network.o layer.o neuron.o ./Quantifier/quantify.o ./Quantifier/gimage.o main.cpp
 	$(CXX) $(CXXFLAGS) neuron.o layer.o network.o ./Quantifier/quantify.o ./Quantifier/gimage.o utils.o main.cpp -o net -lpng -lz
 
-pr: utils.o network.o layer.o neuron.o ./Quantifier/quantify.o ./Quantifier/gimage.o main.cpp main2.cpp
-	$(CXX) $(CXXFLAGS) neuron.o layer.o network.o ./Quantifier/quantify.o ./Quantifier/gimage.o utils.o main2.cpp -o pr -lpng -lz
+#pr: utils.o network.o layer.o neuron.o ./Quantifier/quantify.o ./Quantifier/gimage.o main.cpp main2.cpp
+#	$(CXX) $(CXXFLAGS) neuron.o layer.o network.o ./Quantifier/quantify.o ./Quantifier/gimage.o utils.o main2.cpp -o pr -lpng -lz
 
 clean:
 	rm -f *.o *.nn net && make -C Quantifier clean

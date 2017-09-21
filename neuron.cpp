@@ -63,6 +63,3 @@ void Neuron::feed(vector<double> &inputs){
   z = sum + bias;
   a = sigmoid(sum + bias);
 }
-
-
-
