@@ -21,13 +21,14 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
     // if the layer is not the input layer, then the number of neurons in the layer
     // will depend on the number of inputs received from the previous layer
     // (i.e. number of neurons in the prevous layer)
-    layers.push_back(new Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1]->nNeurons));
+    layers.push_back(new Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1]->nNeurons, i==0));
   }
   for(int n = 0; n < layers[0]->nNeurons; n++){
     layers[0]->neurons[n]->bias = 0;
     for(int w = 0; w < (int)layers[0]->neurons[n]->weights.size(); w++){
       layers[0]->neurons[n]->weights[w] = 0;
-    } 
+    }
+    layers[0]->neurons[n]->inPos = n;
     layers[0]->neurons[n]->weights[n] = 1;
   }
 }
@@ -90,6 +91,8 @@ vector<double> Network::getOutputs(){
 comment me
 */
 void Network::train(sampleSet *s, double trainingConstant){
+  const double tc = -trainingConstant;
+
   for(int i = 0; i < (int)s->inputData->size(); i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
@@ -99,10 +102,10 @@ void Network::train(sampleSet *s, double trainingConstant){
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
-          double deltaW = -1 * trainingConstant * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
+          double deltaW = tc * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
           layers[L]->neurons[N]->weights[W] += deltaW;
         }
-	      layers[L]->neurons[N]->bias -= trainingConstant * layers[L]->neurons[N]->error;
+	layers[L]->neurons[N]->bias += tc * layers[L]->neurons[N]->error;
       }
     }
     
