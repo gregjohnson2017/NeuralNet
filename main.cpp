@@ -19,22 +19,22 @@ void printAverageLayerZ(Network*);
 void printAverageLayerActivation(Network*);
 void printAverageLayerWeights(Network *n);
 void printAverageLayerError(Network *n);
-void trainNetwork(Network *n, const char *trainingData);
+void trainNetwork(Network *n, const char *trainingData, double trainingConstant);
 void testNetwork(Network *n, const char *testingData);
 using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
   Network *n = new Network(3, 28*28, 10);
-  trainNetwork(n, "./Quantifier/training.dat");
+  trainNetwork(n, "./Quantifier/training.dat", 0.15);
   testNetwork(n, "./Quantifier/testing.dat");
   n->saveNetwork("network10set.nn");
   return 1;
 }
 
-void trainNetwork(Network *n, const char *trainingData){
+void trainNetwork(Network *n, const char *trainingData, double trainingConstant){
   sampleSet *training = getSamples(trainingData);
-  n->train(training, 0.65);
+  n->train(training, trainingConstant);
 }
 
 void testNetwork(Network *n, const char *testingData){
@@ -117,7 +117,7 @@ void printHighestLayerZ(Network *n){
 void printSample(vector<double> sample){
   for(int i = 0; i < (int)sample.size(); i++){
     printf("%f, ", (double)sample[i]);
-    if((i%28==0 && i != 0) || i == (int)sample.size() - 1){
+    if((i % 28 == 0 && i != 0) || i == (int)sample.size() - 1){
       printf("\n");
     }
   }
@@ -128,7 +128,6 @@ sampleSet* getSamples(const char *fileName){
   sampleSet *s = (sampleSet*)malloc(sizeof(sampleSet));
   vector<vector<double> > *data = new vector<vector<double> >();
   vector<double> *answers = new vector<double>();
-  int total = 0;
   for(int i = 0; i < d->num_arrays; i++){
     vector<double> sample;
     for(int j = 0; j < d->size; j++){
@@ -138,9 +137,7 @@ sampleSet* getSamples(const char *fileName){
     }
     data->push_back(sample);
     answers->push_back((double)d->answers[i]);
-    if((double)d->answers[i]==0) total++;
   }
-  printf("total = %d\n", total);
   s->inputData = data;
   s->sampleSize = d->size * d->size;
   s->answers = answers;
