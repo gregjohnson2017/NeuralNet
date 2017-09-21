@@ -41,11 +41,11 @@ Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
   this->nInputs = nInputs;
   this->nOutputs = nOutputs;
   this->layers = layers;
+  for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->inPos = n;
+  }
 }
 
-/*
-  Network destructor
-*/
 Network::~Network(){
   layers.clear();
 }
@@ -223,5 +223,10 @@ Network::Network(const char *fileName){
     }
     layers.push_back(new Layer(neurons));
   }
+  
+  for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->inPos = n;
+  }
+  
   printf("Loaded neural network from file %s with %d inputs %d outputs %d layers (read %lu bytes).\n", fileName, nInputs, nOutputs, nLayers, gcc);
 }

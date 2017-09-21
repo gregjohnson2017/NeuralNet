@@ -25,19 +25,22 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  double bestPC = 0, bestTraining = 0;
-  for(double training = 0.15; training < 1.0; training += 0.05){
-    Network *n = new Network(3, 28*28, 10);
-    trainNetwork(n, "./Quantifier/training.dat", 0.15);
-    double PC = testNetwork(n, "./Quantifier/testing.dat");
-    if(PC > bestPC){
-      bestPC = PC;
-      bestTraining = training;
-      printf("New best PC = %f\n", bestPC);
+  double bestPC = 0, bestTraining = 0, bestLayers = 3;
+  for(double training = 0.90; 0; training += 0.05){
+    for(double layers = 3; 0; layers++){
+      Network *n = new Network(layers, 28*28, 10);
+      trainNetwork(n, "./Quantifier/training.dat", training);
+      double PC = testNetwork(n, "./Quantifier/testing.dat");
+      if(PC > bestPC){
+        bestPC = PC;
+        bestTraining = training;
+        bestLayers = layers;
+        printf("New best PC = %f with training = %f and %f layers\n", bestPC, bestTraining, bestLayers);
+        n->saveNetwork("networkBest.nn");
+      }
     }
   }
   printf("Best PC = %f, best training = %f\n", bestPC, bestTraining);
-  //n->saveNetwork("network10set.nn");
   return 1;
 }
 
@@ -140,6 +143,9 @@ sampleSet* getSamples(const char *fileName){
   vector<double> *answers = new vector<double>();
   for(int i = 0; i < d->num_arrays; i++){
     vector<double> sample;
+    if(d->size != 28){
+      printf("AHHH\n");
+    }
     for(int j = 0; j < d->size; j++){
       for(int k = 0; k < d->size; k++){
 	      sample.push_back((double)d->data[i][j][k]/255.0);

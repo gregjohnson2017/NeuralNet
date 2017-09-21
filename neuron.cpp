@@ -38,6 +38,7 @@ Neuron::Neuron(vector<double> &weights, double bias){
   error = 0;
   z = 0;
   a = 0;
+  inPos = -1337;
 }
 
 /*
@@ -60,6 +61,7 @@ void Neuron::feed(vector<double> &inputs){
   }
   if(input){
     z = inputs[inPos];
+    //printf("inPos = %d\n", inPos);
     a = z;//sigmoid(z);
     return;
   }
