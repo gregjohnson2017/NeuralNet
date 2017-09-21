@@ -102,6 +102,7 @@ void Network::train(sampleSet *s, double trainingConstant){
           double deltaW = -1 * trainingConstant * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
           layers[L]->neurons[N]->weights[W] += deltaW;
         }
+	layers[L]->neurons[N]->bias -= trainingConstant * layers[L]->neurons[N]->error;
       }
     }
     

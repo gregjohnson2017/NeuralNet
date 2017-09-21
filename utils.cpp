@@ -15,6 +15,9 @@ double sigmoid(double x){
 	return 1 / (1 + exp(-1 * x));
 }
 
+double inverse_sigmoid(double x){
+  return -log((1-x)/x);
+}
 
 double sigmoid_prime(double x){
 	return sigmoid(x) * (1 - sigmoid(x));
