@@ -23,6 +23,13 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
     // (i.e. number of neurons in the prevous layer)
     layers.push_back(new Layer(neuronsPerLayer, i == 0 ? nInputs : layers[i - 1]->nNeurons));
   }
+  for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->bias = 0;
+    for(int w = 0; w < (int)layers[0]->neurons[n]->weights.size(); w++){
+      layers[0]->neurons[n]->weights[w] = 0;
+    } 
+    layers[0]->neurons[n]->weights[n] = 1;
+  }
 }
 
 /*

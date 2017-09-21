@@ -25,7 +25,7 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  Network *n = new Network(4, 28*28, 10);
+  Network *n = new Network(3, 28*28, 10);
   trainNetwork(n, "./Quantifier/training.dat");
   testNetwork(n, "./Quantifier/testing.dat");
   n->saveNetwork("network10set.nn");
@@ -34,9 +34,7 @@ int main(int argc, char **argv){
 
 void trainNetwork(Network *n, const char *trainingData){
   sampleSet *training = getSamples(trainingData);
-  for(int i = 0; i < 10; i++){
-    n->train(training, 2.65 - 0.2 * i);
-  }
+  n->train(training, 0.65);
 }
 
 void testNetwork(Network *n, const char *testingData){
