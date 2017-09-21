@@ -14,10 +14,13 @@
   that should correspond the number of inputs from the previous layer.
   Each neuron also gets a random bias (-1 to 1 non-inclusive).
 */
-Neuron::Neuron(int nWeights){
+Neuron::Neuron(int nWeights, bool in){
+  input = in;
   bias = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
+  bias *= 1.0 / sqrt(nWeights);
   for(int i = 0; i < nWeights; i++){
     double w = rand()/(double)RAND_MAX * 2 - 1; // -1 to 1 non-inclusive
+    w *= 1.0 / sqrt(nWeights);
     weights.push_back(w);
   }
   error = 0;
@@ -54,6 +57,11 @@ void Neuron::feed(vector<double> &inputs){
   if(inputs.size() != weights.size()){
     fprintf(stderr, "Mismatched inputs and weights expected %lu inputs but got %lu!\n", weights.size(), inputs.size());
     throw std::invalid_argument("mismatched inputs and weights");
+  }
+  if(input){
+    z = inputs[inPos]+bias;
+    a = sigmoid(z);
+    return;
   }
   double sum = 0;
   for(int i = 0; i < (int)weights.size(); i++){

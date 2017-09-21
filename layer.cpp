@@ -5,10 +5,10 @@
   Random Layer constructor, builds a layer of nNeurons neurons.
   Each neuron will be initialized randomly with nInputs weights and a bias.
 */
-Layer::Layer(int nNeurons, int nInputs){
+Layer::Layer(int nNeurons, int nInputs, bool input){
   this->nNeurons = nNeurons;
   for(int i = 0; i < nNeurons; i++){
-    neurons.push_back(new Neuron(nInputs));
+    neurons.push_back(new Neuron(nInputs, input));
   }
 }
 

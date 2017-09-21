@@ -5,7 +5,9 @@ using namespace std;
 class Neuron {
 	public:
 		vector<double> weights;
-		Neuron(int);
+		bool input;
+		int inPos;
+		Neuron(int, bool);
 		Neuron(vector<double> &weights, double bias);
 		~Neuron();
 		double bias, error, z, a;
