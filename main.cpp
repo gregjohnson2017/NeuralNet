@@ -20,15 +20,24 @@ void printAverageLayerActivation(Network*);
 void printAverageLayerWeights(Network *n);
 void printAverageLayerError(Network *n);
 void trainNetwork(Network *n, const char *trainingData, double trainingConstant);
-void testNetwork(Network *n, const char *testingData);
+double testNetwork(Network *n, const char *testingData);
 using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  Network *n = new Network(3, 28*28, 10);
-  trainNetwork(n, "./Quantifier/training.dat", 0.15);
-  testNetwork(n, "./Quantifier/testing.dat");
-  n->saveNetwork("network10set.nn");
+  double bestPC = 0, bestTraining = 0;
+  for(double training = 0.15; training < 1.0; training += 0.05){
+    Network *n = new Network(3, 28*28, 10);
+    trainNetwork(n, "./Quantifier/training.dat", 0.15);
+    double PC = testNetwork(n, "./Quantifier/testing.dat");
+    if(PC > bestPC){
+      bestPC = PC;
+      bestTraining = training;
+      printf("New best PC = %f\n", bestPC);
+    }
+  }
+  printf("Best PC = %f, best training = %f\n", bestPC, bestTraining);
+  //n->saveNetwork("network10set.nn");
   return 1;
 }
 
@@ -37,7 +46,7 @@ void trainNetwork(Network *n, const char *trainingData, double trainingConstant)
   n->train(training, trainingConstant);
 }
 
-void testNetwork(Network *n, const char *testingData){
+double testNetwork(Network *n, const char *testingData){
   sampleSet *testing = getSamples(testingData);
   double numCorrect = 0;
   for(int i = 0; i < (int)testing->inputData->size(); i++){
@@ -57,6 +66,7 @@ void testNetwork(Network *n, const char *testingData){
   }
   double PC = numCorrect * 100 / (double) testing->inputData->size();
   printf("%f%% correct\n", PC);
+  return PC;
 }
 
 void printAverageLayerWeights(Network *n){

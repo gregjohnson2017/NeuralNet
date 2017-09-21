@@ -95,7 +95,7 @@ struct data_collection* read_data(char *data_file){
 		data_c->answers[i] = answer;
 		if(answer == 0) total++;
 	}
-	printf("read total = %d\n", total);
+	printf("read total zero answers = %d\n", total);
 	printf("Read %d arrays of size %d (%lu bytes) from %s\n", num_arrays, size, gcc, data_file); 
 	fclose(fp);
 	return data_c;
