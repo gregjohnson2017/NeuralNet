@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -Werror -g -O4
+CXXFLAGS=-Wall -Werror -g -O4 -march=native
 
 all: net Quantifier/quantify
 
