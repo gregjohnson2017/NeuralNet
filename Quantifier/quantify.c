@@ -90,7 +90,7 @@ struct data_collection* read_data(char *data_file){
 		for(int j = 0; j < size; j++){
 			gcc += fread(data_c->data[i][j], sizeof(*data_c->data[i][j]), size, fp) * sizeof(*data_c->data[i][j]);
 		}
-		int answer;
+		unsigned char answer;
 		gcc += fread(&answer, sizeof(unsigned char), 1, fp) * sizeof(unsigned char); 
 		data_c->answers[i] = answer;
 		if(answer == 0) total++;

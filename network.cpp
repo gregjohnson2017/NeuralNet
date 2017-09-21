@@ -97,7 +97,7 @@ void Network::train(sampleSet *s, double trainingConstant){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    printf("sample %d / %d\n", i, (int)s->inputData->size());
+    //printf("sample %d / %d\n", i, (int)s->inputData->size());
     
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){

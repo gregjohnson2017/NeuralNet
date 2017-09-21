@@ -59,8 +59,8 @@ void Neuron::feed(vector<double> &inputs){
     throw std::invalid_argument("mismatched inputs and weights");
   }
   if(input){
-    z = inputs[inPos]+bias;
-    a = sigmoid(z);
+    z = inputs[inPos];
+    a = z;//sigmoid(z);
     return;
   }
   double sum = 0;
