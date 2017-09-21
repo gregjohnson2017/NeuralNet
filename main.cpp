@@ -25,18 +25,10 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  double bestPC = 0, bestTraining = 0;
-  for(double training = 0.15; training < 1.0; training += 0.05){
-    Network *n = new Network(3, 28*28, 10);
-    trainNetwork(n, "./Quantifier/training.dat", 0.15);
-    double PC = testNetwork(n, "./Quantifier/testing.dat");
-    if(PC > bestPC){
-      bestPC = PC;
-      bestTraining = training;
-      printf("New best PC = %f\n", bestPC);
-    }
-  }
-  printf("Best PC = %f, best training = %f\n", bestPC, bestTraining);
+  Network *n = new Network(3, 28*28, 10);
+  trainNetwork(n, "./Quantifier/training.dat", 0.5);
+  double PC = testNetwork(n, "./Quantifier/testing.dat");
+  printf("PC = %f\n", PC);
   //n->saveNetwork("network10set.nn");
   return 1;
 }
