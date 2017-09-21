@@ -32,9 +32,10 @@ Neuron::Neuron(int nWeights, bool in){
   Neuron constructor for pre-defined weights and bias.
   Used for loading networks
 */
-Neuron::Neuron(vector<double> &weights, double bias){
+Neuron::Neuron(vector<double> &weights, double bias, bool in){
   this->weights = weights;
   this->bias = bias;
+  this->input = in;
   error = 0;
   z = 0;
   a = 0;

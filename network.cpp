@@ -220,7 +220,7 @@ Network::Network(const char *fileName){
       }
       double bias;
       gcc += fread(&bias, sizeof(double), 1, fp) * sizeof(double);
-      neurons->push_back(new Neuron(weights, bias));
+      neurons->push_back(new Neuron(weights, bias, i == 0));
     }
     layers.push_back(new Layer(neurons));
   }
