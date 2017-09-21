@@ -5,12 +5,12 @@
 #include "layer.h"
 using namespace std;
 
-typedef struct samples{
+typedef struct sampleSet{
 	vector<vector<double> > *inputData;
 	vector<double> *answers;
 	int sampleSize; // length of 1d array stretch before next sample
 	// ex 64x64 image: sampleSize = 4096
-} samples;
+} sampleSet;
 
 class Network{
 	public:
@@ -20,14 +20,14 @@ class Network{
 		Network(const char *fileName);
 		~Network();
 		static double trainingConstant(){
-			return 0.1;
+			return 0.3;
 		}
 		static int batchSize(){
-			return 5;
+			return 25;
 		}
 		vector<Layer*> layers;
 		vector<double> getOutputs();
-		void train(samples *s);
+		void train(sampleSet *s, double trainingConstant);
 		void feedNetwork(vector<double> &inputs);
 		void backPropagate();
 		void printNetwork();

@@ -121,10 +121,10 @@ bool write_to_png(image* image, const char* filename){
 	png_write_image(png, image->row_pointers);
 	png_write_end(png, NULL);
 
-	for(int y = 0; y < image->height; y++) {
+	/*for(int y = 0; y < image->height; y++) {
 		free(image->px[y]);
 	}
-	free(image->px);
+	free(image->px);*/
 	fclose(fp);
 	return true;
 }

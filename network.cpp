@@ -16,7 +16,7 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
     int neuronsPerLayer; 
     if(i == 0) neuronsPerLayer = nInputs; // input layer
     else if(i == nLayers - 1) neuronsPerLayer = nOutputs; // output layer
-    else neuronsPerLayer = (nInputs + nOutputs) / 2; // hidden layer (default size)
+    else neuronsPerLayer = (nInputs + nOutputs) / (2); // hidden layer (default size)
     
     // if the layer is not the input layer, then the number of neurons in the layer
     // will depend on the number of inputs received from the previous layer
@@ -82,59 +82,24 @@ vector<double> Network::getOutputs(){
 /*
 comment me
 */
-void Network::train(samples *s){
+void Network::train(sampleSet *s, double trainingConstant){
   vector<vector<double> > batchWeightSum;
   vector<double> batchBiasSum;
   for(int i = 0; i < (int)s->inputData->size(); i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    /*for(int L = 1; L < (int)layers.size() - 1; L++){
+    printf("sample %d / %d\n", i, (int)s->inputData->size());
+    
+    for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
-          double delta = -1 * trainingConstant() * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
-          layers[L]->neurons[N]->weights[W] += delta;
-        }
-      }
-    }*/
-    
-    
-    // gradient decent (to modify biases and weights)
-    if(i % batchSize() == 0){
-      if(i != 0){
-        printf("Batch %d/%d\n", i / batchSize(), (int)s->inputData->size() / batchSize());
-        for(int L = 1; L < (int)layers.size(); L++){
-          for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
-            for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
-              layers[L]->neurons[N]->weights[W] -= trainingConstant() * batchWeightSum[N][W] / (double)batchSize();
-            }
-            layers[L]->neurons[N]->bias -= trainingConstant() * batchBiasSum[N] / (double)batchSize();
-          }
-        }
-        batchWeightSum.clear();
-        batchBiasSum.clear();
-      }
-      for(int L = 1; L < (int)layers.size(); L++){
-        for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
-          vector<double> weightRow;
-          for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
-            weightRow.push_back(layers[L]->neurons[N]->error * layers[L - 1]->neurons[W]->a);
-          }
-          batchWeightSum.push_back(weightRow);
-          batchBiasSum.push_back(layers[L]->neurons[N]->error);
-        }
-      }
-    }else{
-      for(int L = 1; L < (int)layers.size(); L++){
-        for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
-          vector<double> weightRow;
-          for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
-            batchWeightSum[N][W] += layers[L]->neurons[N]->error * layers[L - 1]->neurons[W]->a;
-          }
-          batchBiasSum[N] += layers[L]->neurons[N]->error;
+          double deltaW = -1 * trainingConstant * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
+          layers[L]->neurons[N]->weights[W] += deltaW;
         }
       }
     }
+    
   }
 }
 
@@ -176,8 +141,10 @@ void Network::backPropagate(){
       // set error for the neuron to sum
 	  //double z = layers[l].neurons[j].z;
       //layers[l].neurons[j].error = sum * sigmoid_prime(z);
-  	  double z = layers[l]->neurons[j]->z;
-      layers[l]->neurons[j]->error = abs(sum * sigmoid_prime(z));
+  	  //double z = layers[l]->neurons[j]->z;
+  	  double a = layers[l]->neurons[j]->a;
+//      layers[l]->neurons[j]->error = abs(sum * sigmoid_prime(z));
+      layers[l]->neurons[j]->error = sum * a * (1 - a);
     }
   }
 }

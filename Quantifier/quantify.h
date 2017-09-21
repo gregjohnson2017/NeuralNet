@@ -1,7 +1,7 @@
 #ifndef QUANTIFY_H
 #define QUANTIFY_H
 #include "gimage.h"
-int** getData(image *i, int size);
+unsigned char** getData(image *i, int size);
 int count_files(char *dir);
 typedef struct data_collection{
   unsigned char  ***data, *answers;

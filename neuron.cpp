@@ -33,7 +33,7 @@ Neuron::Neuron(vector<double> &weights, double bias){
   this->weights = weights;
   this->bias = bias;
   error = 0;
-  z = 1337;
+  z = 0;
   a = 0;
 }
 
