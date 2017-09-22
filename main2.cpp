@@ -25,17 +25,17 @@ using namespace std;
 
 int main(int argc, char **argv){
   srand(time(NULL));
-  Network *n = new Network("networkVV.nn");
-  //trainNetwork(n, "./Quantifier/training.dat");
+  Network *n = new Network(4,28*28,10);
+  trainNetwork(n, "./Quantifier/training.dat");
   testNetwork(n, "./Quantifier/testing.dat");
-  //n->saveNetwork("networkVV.nn");
+  n->saveNetwork("network20epoch.nn");
   return 1;
 }
 
 void trainNetwork(Network *n, const char *trainingData){
   sampleSet *training = getSamples(trainingData);
-  for(int i = 0; i < 7; i++){
-    n->train(training, 0.9);//2.65 - 0.2 * i);
+  for(int i = 0; i < 20; i++){
+    n->train(training, 0.9-i*0.01);//2.65 - 0.2 * i);
   }
 }
 

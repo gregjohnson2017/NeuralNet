@@ -203,7 +203,8 @@ Network::Network(const char *fileName){
   printf("x=%dy=%dz=%d\n", nLayers, nInputs, nOutputs);
   this->nLayers = nLayers;
   this->nInputs = nInputs;
-  this->nOutputs = nOutputs;	
+  this->nOutputs = nOutputs;
+  // load each layer from the file
   for(int i = 0; i < nLayers; i++){
     vector<Neuron*> *neurons = new vector<Neuron*>();
     int nNeurons;
@@ -219,14 +220,18 @@ Network::Network(const char *fileName){
       }
       double bias;
       gcc += fread(&bias, sizeof(double), 1, fp) * sizeof(double);
-      neurons->push_back(new Neuron(weights, bias));
+      neurons->push_back(new Neuron(weights, bias, i == 0));
     }
     layers.push_back(new Layer(neurons));
   }
-  
+  // Fix Layer 0's inPos
   for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->bias = 0;
+    for(int w = 0; w < (int)layers[0]->neurons[n]->weights.size(); w++){
+      layers[0]->neurons[n]->weights[w] = 0;
+    }
     layers[0]->neurons[n]->inPos = n;
-  }
-  
+    layers[0]->neurons[n]->weights[n] = 1;
+  } 
   printf("Loaded neural network from file %s with %d inputs %d outputs %d layers (read %lu bytes).\n", fileName, nInputs, nOutputs, nLayers, gcc);
 }
