@@ -41,6 +41,9 @@ Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
   this->nInputs = nInputs;
   this->nOutputs = nOutputs;
   this->layers = layers;
+  for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->inPos = n;
+  }
 }
 
 /*
@@ -105,7 +108,7 @@ void Network::train(sampleSet *s, double trainingConstant){
           double deltaW = tc * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
           layers[L]->neurons[N]->weights[W] += deltaW;
         }
-	layers[L]->neurons[N]->bias += tc * layers[L]->neurons[N]->error;
+	      layers[L]->neurons[N]->bias += tc * layers[L]->neurons[N]->error;
       }
     }
     
@@ -222,6 +225,9 @@ Network::Network(const char *fileName){
       neurons->push_back(new Neuron(weights, bias));
     }
     layers.push_back(new Layer(neurons));
+  }
+  for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->inPos = n;
   }
   printf("Loaded neural network from file %s with %d inputs %d outputs %d layers (read %lu bytes).\n", fileName, nInputs, nOutputs, nLayers, gcc);
 }

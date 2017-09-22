@@ -26,7 +26,7 @@ using namespace std;
 int main(int argc, char **argv){
   srand(time(NULL));
   Network *n = new Network(3, 28*28, 10);
-  trainNetwork(n, "./Quantifier/training.dat", 0.5);
+  trainNetwork(n, "./Quantifier/training.dat", 0.45);
   double PC = testNetwork(n, "./Quantifier/testing.dat");
   printf("PC = %f\n", PC);
   //n->saveNetwork("network10set.nn");
