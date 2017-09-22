@@ -62,8 +62,6 @@ struct data_collection* create_data(int num_arrays, int size){
 }
 
 void destroy_data(struct data_collection *d){
-  printf("data destroyed\n");
-  abort();
 	free(d->answers);
 	for(int i = 0; i < d->num_arrays; i++){
 		for(int j = 0; j < d->size; j++){
@@ -146,7 +144,8 @@ void write_data(char *dir, int size, char *data_file){
 // only for square arrays
 void print_data(struct data_collection *d){
 	for(int a = 0; a < d->num_arrays; a++){
-		printf("ARRAY %d: (Answer = %d)\n", a, d->answers[a]);
+	  if(a%10!=0)continue;
+		printf("ARRAY %d: (Answer = %c)\n", a, d->answers[a]+'a');
 		for(int i = 0; i < d->size; i++){
 			printf("{");
 			for(int j = 0; j < d->size; j++){

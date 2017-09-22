@@ -8,7 +8,7 @@ class Neuron {
 		bool input;
 		int inPos;
 		Neuron(int, bool);
-		Neuron(vector<double> &weights, double bias);
+		Neuron(vector<double> &weights, double bias, bool);
 		~Neuron();
 		double bias, error, z, a;
 		void feed(vector<double> &);

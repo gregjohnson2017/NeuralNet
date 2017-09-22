@@ -46,9 +46,6 @@ Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
   }
 }
 
-/*
-  Network destructor
-*/
 Network::~Network(){
   layers.clear();
 }
@@ -96,12 +93,15 @@ comment me
 void Network::train(sampleSet *s, double trainingConstant){
   const double tc = -trainingConstant;
 
-  for(int i = 0; i < (int)s->inputData->size(); i++){
+  int numSamples = (int)s->inputData->size();
+
+  for(int i = 0; i < numSamples; i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    //printf("sample %d / %d\n", i, (int)s->inputData->size());
-    
+    if(i%1000==0){
+      printf("%f%%\n", i * 100.0 / numSamples);
+    }
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
@@ -124,7 +124,7 @@ Assumes feedNetwork was already called, so the final
 neurons each have an output
 */
 void Network::computeOutputError(double answer){
-  for(int i = 0; i < layers[layers.size() - 1]->nNeurons; i++){
+  for(int i = 0; i < layers[layers.size() - 1]->nNeurons; i++){ // 0 to 25
     double y = i == answer ? 1 : 0;
     Neuron *n = layers[layers.size() - 1]->neurons[i]; // final layer
     n->error = (n->a - y) * n->a * (1 - n->a);
@@ -135,12 +135,10 @@ void Network::computeOutputError(double answer){
   Calculates and updates the errors of the neurons
 */
 void Network::backPropagate(){
-  // loop through layers l = L-1, L-2, ..., 2
-  for(int l = nLayers - 2; l >= 1; l--){ // L-1 <=> nLayers - 2; 2 <=> 1
-    // loop through neurons j in layer l
+  // loop backwards from last hidden layer to first hidden layer
+  for(int l = nLayers - 2; l >= 1; l--){
     for(int j = 0; j < layers[l]->nNeurons; j++){
       double sum = 0;
-      // loop through neurons k in layer l+1
       for(int k = 0; k < (int)layers[l + 1]->neurons.size(); k++){
 	      double w = layers[l + 1]->neurons[k]->weights[j];
 	      double e = layers[l + 1]->neurons[k]->error;
@@ -206,7 +204,8 @@ Network::Network(const char *fileName){
   printf("x=%dy=%dz=%d\n", nLayers, nInputs, nOutputs);
   this->nLayers = nLayers;
   this->nInputs = nInputs;
-  this->nOutputs = nOutputs;	
+  this->nOutputs = nOutputs;
+  // load each layer from the file
   for(int i = 0; i < nLayers; i++){
     vector<Neuron*> *neurons = new vector<Neuron*>();
     int nNeurons;
@@ -222,12 +221,18 @@ Network::Network(const char *fileName){
       }
       double bias;
       gcc += fread(&bias, sizeof(double), 1, fp) * sizeof(double);
-      neurons->push_back(new Neuron(weights, bias));
+      neurons->push_back(new Neuron(weights, bias, i == 0));
     }
     layers.push_back(new Layer(neurons));
   }
+  // Fix Layer 0's inPos
   for(int n = 0; n < layers[0]->nNeurons; n++){
+    layers[0]->neurons[n]->bias = 0;
+    for(int w = 0; w < (int)layers[0]->neurons[n]->weights.size(); w++){
+      layers[0]->neurons[n]->weights[w] = 0;
+    }
     layers[0]->neurons[n]->inPos = n;
-  }
+    layers[0]->neurons[n]->weights[n] = 1;
+  } 
   printf("Loaded neural network from file %s with %d inputs %d outputs %d layers (read %lu bytes).\n", fileName, nInputs, nOutputs, nLayers, gcc);
 }
