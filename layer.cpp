@@ -37,11 +37,7 @@ vector<double> Layer::getOutputs(){
   return outputs;
 }
 
-/*
-  Layer destructor
-*/
 Layer::~Layer(){
-  printf("layer destroyed\n");
   neurons.clear();
 }
 

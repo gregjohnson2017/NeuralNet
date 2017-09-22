@@ -39,7 +39,7 @@ Neuron::Neuron(vector<double> &weights, double bias, bool in){
   error = 0;
   z = 0;
   a = 0;
-  inPos = -1337;
+  inPos = 0;
 }
 
 /*

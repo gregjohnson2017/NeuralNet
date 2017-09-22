@@ -93,19 +93,22 @@ comment me
 void Network::train(sampleSet *s, double trainingConstant){
   const double tc = -trainingConstant;
 
-  for(int i = 0; i < (int)s->inputData->size(); i++){
+  int numSamples = (int)s->inputData->size();
+
+  for(int i = 0; i < numSamples; i++){
     feedNetwork(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
-    //printf("sample %d / %d\n", i, (int)s->inputData->size());
-    
+    if(i%1000==0){
+      printf("%f%%\n", i * 100.0 / numSamples);
+    }
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
         for(int W = 0; W < (int)layers[L]->neurons[N]->weights.size(); W++){
           double deltaW = tc * layers[L - 1]->neurons[W]->a * layers[L]->neurons[N]->error;
           layers[L]->neurons[N]->weights[W] += deltaW;
         }
-	layers[L]->neurons[N]->bias += tc * layers[L]->neurons[N]->error;
+	      layers[L]->neurons[N]->bias += tc * layers[L]->neurons[N]->error;
       }
     }
     
@@ -121,7 +124,7 @@ Assumes feedNetwork was already called, so the final
 neurons each have an output
 */
 void Network::computeOutputError(double answer){
-  for(int i = 0; i < layers[layers.size() - 1]->nNeurons; i++){
+  for(int i = 0; i < layers[layers.size() - 1]->nNeurons; i++){ // 0 to 25
     double y = i == answer ? 1 : 0;
     Neuron *n = layers[layers.size() - 1]->neurons[i]; // final layer
     n->error = (n->a - y) * n->a * (1 - n->a);
@@ -132,12 +135,10 @@ void Network::computeOutputError(double answer){
   Calculates and updates the errors of the neurons
 */
 void Network::backPropagate(){
-  // loop through layers l = L-1, L-2, ..., 2
-  for(int l = nLayers - 2; l >= 1; l--){ // L-1 <=> nLayers - 2; 2 <=> 1
-    // loop through neurons j in layer l
+  // loop backwards from last hidden layer to first hidden layer
+  for(int l = nLayers - 2; l >= 1; l--){
     for(int j = 0; j < layers[l]->nNeurons; j++){
       double sum = 0;
-      // loop through neurons k in layer l+1
       for(int k = 0; k < (int)layers[l + 1]->neurons.size(); k++){
 	      double w = layers[l + 1]->neurons[k]->weights[j];
 	      double e = layers[l + 1]->neurons[k]->error;

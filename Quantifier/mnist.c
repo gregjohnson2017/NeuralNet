@@ -75,12 +75,67 @@ void write_mnist_data(struct data_collection *mnist_data, char *data_file){
   fclose(fp);
 }
 
+struct data_collection* read_emnist_data(char *image_file, char *label_file){
+	FILE *image_fp = fopen(image_file, "rb");
+	FILE *label_fp = fopen(label_file, "rb");
+	if(!image_fp){
+		fprintf(stderr, "FILE %s NOT FOUND\n", image_file);
+		abort();
+	}else if (!label_fp){
+	  fprintf(stderr, "FILE %s NOT FOUND\n", label_file);
+		abort();
+	}
+	size_t image_gcc = 0, label_gcc = 0;
+	int image_magic, image_count, image_rows, image_cols;
+	image_gcc += fread(&image_magic, sizeof(int), 1, image_fp) * sizeof(int);
+	image_gcc += fread(&image_count, sizeof(int), 1, image_fp) * sizeof(int);
+	image_gcc += fread(&image_rows, sizeof(int), 1, image_fp) * sizeof(int);
+	image_gcc += fread(&image_cols, sizeof(int), 1, image_fp) * sizeof(int);
+	// big endian -> host endian
+	image_magic = bswap_32(image_magic);
+	image_count = bswap_32(image_count);
+	image_rows = bswap_32(image_rows);
+	image_cols = bswap_32(image_cols);
+	int label_magic, label_count;
+	label_gcc += fread(&label_magic, sizeof(int), 1, label_fp) * sizeof(int);
+	label_gcc += fread(&label_count, sizeof(int), 1, label_fp) * sizeof(int);
+	// big endian -> host endian
+	label_magic = bswap_32(label_magic);
+	label_count = bswap_32(label_count);
+	printf("image count = %d rows = %d cols = %d\n", image_count, image_rows, image_cols);
+	printf("label count = %d\n", image_count);
+	if(image_count != label_count){
+	  fprintf(stderr, "mismatched image and label count (%d and %d)\n", image_count, label_count);
+	}
+	if(image_rows != image_cols){
+	  fprintf(stderr, "image rows and cols not equal (%d and %d)\n", image_rows, image_cols);
+	}
+	struct data_collection *data_c = create_data(image_count, image_rows);
+	for(int i = 0; i < image_count; i++){
+		for(int j = 0; j < image_rows; j++){
+		  for(int k = 0; k < image_cols; k++){
+  			image_gcc += fread(&data_c->data[i][k][j], sizeof(data_c->data[i][k][j]), 1, image_fp) * sizeof(data_c->data[i][k][j]);
+  		}
+		}
+		unsigned char answer;
+		label_gcc += fread(&answer, sizeof(unsigned char), 1, label_fp) * sizeof(unsigned char); 
+		data_c->answers[i] = answer;
+		//printf("read image %d / %d\n", i, image_count);
+	}
+	printf("Read %d arrays of size %dx%d (%lu bytes) from %s\n", image_count, image_rows, image_cols,  image_gcc, image_file);
+	printf("Read %d labels (%lu bytes) from %s\n", label_count, label_gcc, label_file);
+	fclose(image_fp);
+	fclose(label_fp);
+	return data_c;
+}
+
 void generate_mnist_images(struct data_collection *m){
   pxinfo **new = malloc(sizeof(pxinfo*) * m->size);
 	for(int i = 0; i < m->size; i++){
 		new[i] = malloc(sizeof(pxinfo) * m->size);
 	}
 	for(int pic = 0; pic < m->num_arrays; pic++){
+	  if(pic%100!=0)continue;
 	  for(int r = 0; r < m->size; r++){
 	    for(int c = 0; c < m->size; c++){
 	      new[r][c].r = 255 - m->data[pic][r][c];
@@ -105,3 +160,40 @@ void generate_mnist_images(struct data_collection *m){
 	}
 	
 }
+
+void generate_emnist_images(struct data_collection *m){
+  pxinfo **new = malloc(sizeof(pxinfo*) * m->size);
+	for(int i = 0; i < m->size; i++){
+		new[i] = malloc(sizeof(pxinfo) * m->size);
+	}
+	for(int pic = 0; pic < m->num_arrays; pic++){
+	  if(pic%101!=0)continue;
+	  for(int r = 0; r < m->size; r++){
+	    for(int c = 0; c < m->size; c++){
+	      new[r][c].r = 255 - m->data[pic][r][c];
+			  new[r][c].g = 255 - m->data[pic][r][c];
+			  new[r][c].b = 255 - m->data[pic][r][c];
+			  new[r][c].a = 255;
+	    }
+	  }
+	  
+	  char *template_filename = "template.png";
+	  image *i;
+	  if(!(i = extract_from_png(template_filename))){
+		  fprintf(stderr, "CANNOT READ FILE %s\n", template_filename);
+	  }
+    i->px = new;
+	  char *filename = malloc(sizeof(char) * 60);
+	  mkdir("./Testing_Samples", 0777);
+	  sprintf(filename, "./Testing_Samples/training_sample%d_%c.png", pic, m->answers[pic]+'a');
+	  write_to_png(i, filename);
+	  //free(filename);
+	  //free(i);
+	}
+	
+}
+
+
+
+
+
