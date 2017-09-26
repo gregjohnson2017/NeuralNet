@@ -5,18 +5,19 @@
 #include <dirent.h>
 #include <string.h>
 
-struct pixel** getData(image *i, int size){
+struct pixel*** getData(image *i, int size){
 	if(i->width != size || i->height != size) {
 		printf("Size is not %dx%d!\n", size, size);
 		return NULL;
 	}
-	struct pixel **data = (struct pixel**)malloc(sizeof(struct pixel*) * size);
+	struct pixel ***data = (struct pixel***)malloc(sizeof(struct pixel**) * size);
 	for(int i = 0; i < size; i++){
-		data[i] = (struct pixel*)malloc(sizeof(struct pixel) * size);
+		data[i] = (struct pixel**)malloc(sizeof(struct pixel*) * size);
 	}
 	for(int y = 0; y < i->height; y++) {
 		for(int x = 0; x < i->width; x++) {
 			png_bytep px = &(i->row_pointers[y][(x) * 4]);
+			data[y][x] = (struct pixel*)malloc(sizeof(struct pixel));
 			data[y][x]->r = px[0];
 			data[y][x]->g = px[1];
 			data[y][x]->b = px[2];
