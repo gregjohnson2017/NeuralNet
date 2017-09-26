@@ -119,7 +119,7 @@ struct data_collection* read_emnist_data(char *image_file, char *label_file){
 		}
 		unsigned char answer;
 		label_gcc += fread(&answer, sizeof(unsigned char), 1, label_fp) * sizeof(unsigned char); 
-		data_c->answers[i] = answer;
+		data_c->answers[i] = answer - 1;
 		//printf("read image %d / %d\n", i, image_count);
 	}
 	printf("Read %d arrays of size %dx%d (%lu bytes) from %s\n", image_count, image_rows, image_cols,  image_gcc, image_file);
@@ -135,7 +135,7 @@ void generate_mnist_images(struct data_collection *m){
 		new[i] = malloc(sizeof(pxinfo) * m->size);
 	}
 	for(int pic = 0; pic < m->num_arrays; pic++){
-	  if(pic%100!=0)continue;
+	  //if(pic%100!=0)continue;
 	  for(int r = 0; r < m->size; r++){
 	    for(int c = 0; c < m->size; c++){
 	      new[r][c].r = 255 - m->data[pic][r][c];
@@ -167,7 +167,7 @@ void generate_emnist_images(struct data_collection *m){
 		new[i] = malloc(sizeof(pxinfo) * m->size);
 	}
 	for(int pic = 0; pic < m->num_arrays; pic++){
-	  if(pic%101!=0)continue;
+	  if(pic%100!=0)continue;
 	  for(int r = 0; r < m->size; r++){
 	    for(int c = 0; c < m->size; c++){
 	      new[r][c].r = 255 - m->data[pic][r][c];
@@ -185,7 +185,7 @@ void generate_emnist_images(struct data_collection *m){
     i->px = new;
 	  char *filename = malloc(sizeof(char) * 60);
 	  mkdir("./Testing_Samples", 0777);
-	  sprintf(filename, "./Testing_Samples/training_sample%d_%c.png", pic, m->answers[pic]+'a');
+	  sprintf(filename, "./Testing_Samples/training_sample%d_%c.png", pic, m->answers[pic]+'a'-1);
 	  write_to_png(i, filename);
 	  //free(filename);
 	  //free(i);

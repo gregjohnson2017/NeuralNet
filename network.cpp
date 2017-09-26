@@ -2,13 +2,18 @@
 #include "utils.h"
 #include <vector>
 
+extern "C" {
+#include "./Quantifier/quantify.h"
+}
+
 using namespace std;
 
 /*
   Network constructor: Initialized to have a given number of  random layers, 
   with a specified input and output layer size.
 */
-Network::Network(int nLayers, int nInputs, int nOutputs){
+Network::Network(int nLayers, int nInputs, int nOutputs, errorFunc err){
+  this->getError = err;
   this->nLayers = nLayers;
   this->nInputs = nInputs;
   this->nOutputs = nOutputs;
@@ -36,7 +41,7 @@ Network::Network(int nLayers, int nInputs, int nOutputs){
 /*
   Network constructor used for loading pre-defined networks
 */
-Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
+/*Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
   this->nLayers = layers.size();
   this->nInputs = nInputs;
   this->nOutputs = nOutputs;
@@ -44,7 +49,7 @@ Network::Network(vector<Layer*> &layers, int nInputs, int nOutputs){
   for(int n = 0; n < layers[0]->nNeurons; n++){
     layers[0]->neurons[n]->inPos = n;
   }
-}
+}*/
 
 Network::~Network(){
   layers.clear();
@@ -58,7 +63,7 @@ void Network::printNetwork(){
   Completes one pass through the network, returning the outputs of the neurons
   in the final layer.
 */
-void Network::feedNetwork(vector<double> &inputs){
+void Network::feedForward(vector<double> &inputs){
   if(inputs.size() != layers[0]->neurons.size()){
     printf("inputs size = %d and input layer size = %d\n", (int)inputs.size(), (int)layers[0]->neurons.size());
     throw invalid_argument("inputs != input layer");
@@ -88,19 +93,22 @@ vector<double> Network::getOutputs(){
 }
 
 /*
-comment me
+Train a network by feeding input forward through the network, calculating the final output error,
+backpropagating that error back through the hidden layers, and then calculating weight deltas to
+correct the weights of the network. Does not use batches.
 */
-void Network::train(sampleSet *s, double trainingConstant){
-  const double tc = -trainingConstant;
+void Network::train(const char *fileName, double trainingConstant){
+  sampleSet *s = getSamples(fileName);
+  const double tc = -trainingConstant; // optimization, please pass positive
 
   int numSamples = (int)s->inputData->size();
 
   for(int i = 0; i < numSamples; i++){
-    feedNetwork(s->inputData->at(i));
+    feedForward(s->inputData->at(i));
     computeOutputError(s->answers->at(i));
     backPropagate();
     if(i%1000==0){
-      printf("%f%%\n", i * 100.0 / numSamples);
+      printf("%s %f%%\n", fileName, i * 100.0 / numSamples);
     }
     for(int L = 1; L < (int)layers.size() - 1; L++){
       for(int N = 0; N < (int)layers[L]->neurons.size(); N++){
@@ -120,7 +128,7 @@ void Network::train(sampleSet *s, double trainingConstant){
 This function should be unique to an implementation
  -> should be specified by the user, not hard-coded here
  
-Assumes feedNetwork was already called, so the final
+Assumes feedForward was already called, so the final
 neurons each have an output
 */
 void Network::computeOutputError(double answer){
@@ -132,7 +140,8 @@ void Network::computeOutputError(double answer){
 }
 
 /*
-  Calculates and updates the errors of the neurons
+  Calculates and updates the errors of the neurons in the hidden layers.
+  Requires that the output layer errors were calculated first.
 */
 void Network::backPropagate(){
   // loop backwards from last hidden layer to first hidden layer
@@ -150,6 +159,62 @@ void Network::backPropagate(){
   }
 }
 
+void printSample(vector<double> sample){
+  for(int i = 0; i < (int)sample.size(); i++){
+    printf((double)sample[i] == 0 ? "-, " : "1, ");
+    if((i%28==0 && i != 0) || i == (int)sample.size() - 1){
+      printf("\n");
+    }
+  }
+}
+
+void Network::test(const char *testingData){
+  sampleSet *testing = getSamples(testingData);
+  double numCorrect = 0;
+  for(int i = 0; i < (int)testing->inputData->size(); i++){
+    this->feedForward(testing->inputData->at(i));
+    vector<double> outputs = this->getOutputs();
+    double highestOutput = outputs[0], guess = 0;
+    for(int j = 0; j < (int)outputs.size(); j++){
+      if(outputs[j] > highestOutput){
+        guess = j;
+        highestOutput = outputs[j];
+      }
+    }
+    if(testing->answers->at(i) == guess){
+      numCorrect++;
+    }else{
+      printf("WRONG: Guess: %f, Answer: %f\n", guess, testing->answers->at(i));
+      printSample(testing->inputData->at(i));
+    }
+    outputs.clear();
+  }
+  printf("%s %f%% correct\n", testingData, numCorrect * 100 / (double) testing->inputData->size());
+}
+
+sampleSet* getSamples(const char *fileName){
+  struct data_collection *d = read_data((char*)fileName);
+  sampleSet *s = (sampleSet*)malloc(sizeof(sampleSet));
+  vector<vector<double> > *data = new vector<vector<double> >();
+  vector<double> *answers = new vector<double>();
+  int total = 0;
+  for(int i = 0; i < d->num_arrays; i++){
+    vector<double> sample;
+    for(int j = 0; j < d->size; j++){
+      for(int k = 0; k < d->size; k++){
+	      sample.push_back((double)d->data[i][j][k]/255.0);
+      }
+    }
+    data->push_back(sample);
+    answers->push_back((double)d->answers[i]);
+    if((double)d->answers[i]==0) total++;
+  }
+  s->inputData = data;
+  s->sampleSize = d->size * d->size;
+  s->answers = answers;
+  return s;
+}
+
 /*
   Network FILE FORMAT:
   nInputs (int)
@@ -164,7 +229,7 @@ void Network::backPropagate(){
   ...
   EOF
 */
-void Network::saveNetwork(const char *fileName){
+void Network::save(const char *fileName){
   FILE *fp = fopen(fileName, "wb");
   if(!fp){
     printf("Error opening %s\n", fileName);
@@ -190,7 +255,8 @@ void Network::saveNetwork(const char *fileName){
 /*
   Loads a network from specified file. (See saveNetwork for file format)
 */
-Network::Network(const char *fileName){
+Network::Network(const char *fileName, errorFunc err){
+  this->getError = err;
   FILE *fp = fopen(fileName, "rb");
   if(!fp){
     printf("Error opening %s\n", fileName);
