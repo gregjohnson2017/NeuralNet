@@ -3,9 +3,12 @@
 #include "gimage.h"
 unsigned char** getData(image *i, int size);
 int count_files(char *dir);
+typedef struct pixel{
+  unsigned char r, g, b;
+}pixel;
 typedef struct data_collection{
-  unsigned char  ***data, *answers;
-	int num_arrays, size;
+	int num_arrays, size, depth;
+  struct pixel ***data, ***answers;
 } data_collection;
 struct data_collection* create_data(int num_arrays, int size);
 void destroy_data(struct data_collection *d);

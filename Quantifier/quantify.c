@@ -5,19 +5,21 @@
 #include <dirent.h>
 #include <string.h>
 
-unsigned char** getData(image *i, int size){
-	unsigned char **data = (unsigned char**)malloc(sizeof(unsigned char*) * size);
-	for(int i = 0; i < size; i++){
-		data[i] = (unsigned char*)malloc(sizeof(unsigned char) * size);
-	}
+struct pixel** getData(image *i, int size){
 	if(i->width != size || i->height != size) {
 		printf("Size is not %dx%d!\n", size, size);
 		return NULL;
 	}
+	struct pixel **data = (struct pixel**)malloc(sizeof(struct pixel*) * size);
+	for(int i = 0; i < size; i++){
+		data[i] = (struct pixel*)malloc(sizeof(struct pixel) * size);
+	}
 	for(int y = 0; y < i->height; y++) {
 		for(int x = 0; x < i->width; x++) {
 			png_bytep px = &(i->row_pointers[y][(x) * 4]);
-			data[y][x] = 255 - px[0];
+			data[y][x]->r = px[0];
+			data[y][x]->g = px[1];
+			data[y][x]->b = px[2];
 		}
 	}
 	return data;
@@ -44,14 +46,16 @@ int count_files(char *dir){
 	return count;
 }
 
-struct data_collection* create_data(int num_arrays, int size){
+struct data_collection* create_data(int num_arrays, int size, int depth){
 	struct data_collection *data_c = (struct data_collection*)malloc(sizeof(struct data_collection));
-	unsigned char ***data = (unsigned char***)malloc(sizeof(unsigned char**) * num_arrays);
-	unsigned char *answers = (unsigned char*)malloc(sizeof(unsigned char) * num_arrays);
+	struct pixel ***data = (struct pixel***)malloc(sizeof(struct pixel**) * num_arrays);
+	struct pixel ***answers = (struct pixel***)malloc(sizeof(struct pixel**) * num_arrays);
 	for(int i = 0; i < num_arrays; i++){
-		data[i] = (unsigned char**)malloc(sizeof(unsigned char*) * size);
+		data[i] = (struct pixel**)malloc(sizeof(struct pixel*) * size);
+		answers[i] = (struct pixel**)malloc(sizeof(struct pixel*) * size);
 		for(int j = 0; j < size; j++){
-			data[i][j] = (unsigned char*)malloc(sizeof(unsigned char) * size);
+			data[i][j] = (struct pixel*)malloc(sizeof(struct pixel) * size);
+			answers[i][j] = (struct pixel*)malloc(sizeof(struct pixel) * size);
 		}
 	}
 	data_c->data = data;
@@ -78,10 +82,11 @@ struct data_collection* read_data(char *data_file){
 		fprintf(stderr, "FILE %s NOT FOUND\n", data_file);
 		abort();
 	}
-	int num_arrays, size;
+	int num_arrays, size, depth;
 	size_t gcc = 0;
 	gcc += fread(&num_arrays, sizeof(int), 1, fp) * sizeof(int);
 	gcc += fread(&size, sizeof(int), 1, fp) * sizeof(int);
+	gcc += fread(&depth, size(int), 1, fp) * sizeof(int);
 	struct data_collection *data_c = create_data(num_arrays, size);
 	int total = 0;
 	for(int i = 0; i < num_arrays; i++){
@@ -99,12 +104,12 @@ struct data_collection* read_data(char *data_file){
 	return data_c;
 }
 
-void write_data(char *dir, int size, char *data_file){
+void write_data(char *dir, int size, char *data_file, int depth){
 	int num_files = count_files(dir);
 	FILE *fp = fopen(data_file, "wb");
 	fwrite(&num_files, sizeof(num_files), 1, fp);
 	fwrite(&size, sizeof(size), 1, fp);
-
+  fwrite(&depth, sizeof(depth), 1, fp));
 	struct dirent *dp;
 	DIR *fd;
 	if(!fp) printf("Error opening file\n");
@@ -125,6 +130,9 @@ void write_data(char *dir, int size, char *data_file){
 		for(int i = 0; i < size; i++){
 			fwrite(data[i], sizeof(*data[i]), size, fp);
 		}
+		
+		
+		
 		unsigned char answer = atoi(dp->d_name);
 		printf("reading answer as %d\n", answer);
 		fwrite(&answer, sizeof(unsigned char), 1, fp);
