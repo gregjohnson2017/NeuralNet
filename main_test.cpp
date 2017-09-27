@@ -15,6 +15,7 @@ extern "C" {
 using namespace std;
 
 int main(int argc, char **argv){
+
   Network *n = new Network("network.nn", NULL);
   const char *emnist_testing = "./Quantifier/NetworkData/emnist-digits-testing.dat";
   //const char *mnist_testing = "./Quantifier/NetworkData/mnist-digits-testing.dat";

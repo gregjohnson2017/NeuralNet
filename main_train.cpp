@@ -15,6 +15,7 @@ extern "C" {
 using namespace std;
 
 int main(int argc, char **argv){
+
   srand(time(NULL));
   Network *n = new Network(4, 28*28, 26, NULL);
   n->train("./Quantifier/NetworkData/emnist-letters -training.dat", 1.0);
