@@ -3,8 +3,12 @@
 #include "gimage.h"
 unsigned char** getData(image *i, int size);
 int count_files(char *dir);
+typedef struct image{
+  int size;
+  struct pixel ***data;
+}image;
 typedef struct pixel{
-  unsigned char r, g, b;
+  unsigned char r, g, b, a;
 }pixel;
 typedef struct data_collection{
 	int num_arrays, size, depth;

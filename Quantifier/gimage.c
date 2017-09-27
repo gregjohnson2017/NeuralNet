@@ -1,8 +1,8 @@
 /* Adapted from Guillaume Cottenceau's and Yoshimasa Niwa's work */
 #include "gimage.h"
 #include <stdio.h>
-image* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers){
-	image *i = malloc(sizeof(image));
+pngimage* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers){
+	pngimage *i = malloc(sizeof(image));
 	i->width = width;
 	i->height = height;
 	i->px = px;
@@ -10,7 +10,7 @@ image* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers)
 	return i;
 }
 
-image* extract_from_png(const char* filename){
+pngimage* extract_from_png(const char* filename){
 	int width, height;
 	png_byte color_type, bit_depth;
 	png_bytep *row_pointers;
@@ -79,11 +79,11 @@ image* extract_from_png(const char* filename){
 			px[y][x].lum = 0.2126f * data[0] + 0.7152f * data[1] + 0.0722f * data[2];
 		}
 	}
-	image *image = create_image(width, height, px, row_pointers);
+	pngimage *image = create_image(width, height, px, row_pointers);
 	return image;
 }
 
-bool write_to_png(image* image, const char* filename){
+bool write_to_png(pngimage* image, const char* filename){
 	FILE *fp = fopen(filename, "wb");
 	if(!fp) return NULL;
 
@@ -129,7 +129,7 @@ bool write_to_png(image* image, const char* filename){
 	return true;
 }
 
-void process(image* image){
+void process(pngimage* image){
 	for(int y = 0; y < image->height; y++) {
 		png_bytep row = image->row_pointers[y];
 		for(int x = 0; x < image->width; x++) {

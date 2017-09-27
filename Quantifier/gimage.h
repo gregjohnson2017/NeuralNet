@@ -8,16 +8,13 @@
 typedef struct pxinfo{
 	float r, g, b, a, lum;
 } pxinfo;
-typedef struct image{
+typedef struct pngimage{
 	int width, height;
 	pxinfo **px;
 	png_bytep *row_pointers;
-} image;
-
+} pngimage;
 image* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers);
-
 image* extract_from_png(const char* filename);
-void process(image*);
-bool write_to_png(image* image, const char* filename);
-
+void process(pngimage*);
+bool write_to_png(pngimage* image, const char* filename);
 #endif

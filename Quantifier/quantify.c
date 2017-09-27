@@ -5,25 +5,30 @@
 #include <dirent.h>
 #include <string.h>
 
-struct pixel*** getData(image *i, int size){
-	if(i->width != size || i->height != size) {
+struct image* getData(pngimage *pngi, int size){
+	if(pngi->width != size || pngi->height != size) {
 		printf("Size is not %dx%d!\n", size, size);
 		return NULL;
 	}
+	struct image *i = (struct pixelarr*)malloc(sizoef(struct image));
+	i->size = size;
 	struct pixel ***data = (struct pixel***)malloc(sizeof(struct pixel**) * size);
-	for(int i = 0; i < size; i++){
-		data[i] = (struct pixel**)malloc(sizeof(struct pixel*) * size);
+	for(int j = 0; j < size; j++){
+		data[j] = (struct pixel**)malloc(sizeof(struct pixel*) * size);
 	}
+	
 	for(int y = 0; y < i->height; y++) {
 		for(int x = 0; x < i->width; x++) {
-			png_bytep px = &(i->row_pointers[y][(x) * 4]);
 			data[y][x] = (struct pixel*)malloc(sizeof(struct pixel));
-			data[y][x]->r = px[0];
-			data[y][x]->g = px[1];
-			data[y][x]->b = px[2];
+			data[y][x]->r = pngi->px[0];
+			data[y][x]->g = pngi->px[1];
+			data[y][x]->b = pngi->px[2];
+			data[y][x]->a = pngi->px[3];
 		}
 	}
-	return data;
+	
+	i->data = data;
+	return i;
 }
 
 /*
@@ -89,6 +94,7 @@ struct data_collection* read_data(char *data_file){
 	gcc += fread(&size, sizeof(int), 1, fp) * sizeof(int);
 	gcc += fread(&depth, size(int), 1, fp) * sizeof(int);
 	struct data_collection *data_c = create_data(num_arrays, size);
+	
 	int total = 0;
 	for(int i = 0; i < num_arrays; i++){
 		for(int j = 0; j < size; j++){
@@ -122,12 +128,19 @@ void write_data(char *dir, int size, char *data_file, int depth){
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")){
 			continue;    /* skip self and parent */
 		}
-		char *path = (char*)malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
-		sprintf(path, "%s/%s", dir, dp->d_name);
-		image *i = extract_from_png(path);
+		char *data_path = (char*)malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
+		sprintf(data_path, "%s/%s", dir, dp->d_name);
+		pngimage *data = extract_from_png(data_path);
+		
+		char *answer_path = (char*)malloc(sizeof(char) * (strlen(dir) + strlen(dp->d_name) + 20));
+		sprintf(answer_path, "%s/a_%s", dir, dp->d_name);
+		pngimage *answer = extract_from_png(answer_path);
+		
+		
+		
 		
 		// write data
-		unsigned char **data = getData(i, size);
+		unsigned char **data = getData(data, size);
 		for(int i = 0; i < size; i++){
 			fwrite(data[i], sizeof(*data[i]), size, fp);
 		}

@@ -146,7 +146,7 @@ void generate_mnist_images(struct data_collection *m){
 	  }
 	  
 	  char *template_filename = "template.png";
-	  image *i;
+	  pngimage *i;
 	  if(!(i = extract_from_png(template_filename))){
 		  fprintf(stderr, "CANNOT READ FILE %s\n", template_filename);
 	  }
@@ -178,7 +178,7 @@ void generate_emnist_images(struct data_collection *m){
 	  }
 	  
 	  char *template_filename = "template.png";
-	  image *i;
+	  pngimage *i;
 	  if(!(i = extract_from_png(template_filename))){
 		  fprintf(stderr, "CANNOT READ FILE %s\n", template_filename);
 	  }
