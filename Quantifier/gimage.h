@@ -13,8 +13,8 @@ typedef struct pngimage{
 	pxinfo **px;
 	png_bytep *row_pointers;
 } pngimage;
-image* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers);
-image* extract_from_png(const char* filename);
+pngimage* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers);
+pngimage* extract_from_png(const char* filename);
 void process(pngimage*);
 bool write_to_png(pngimage* image, const char* filename);
 #endif

@@ -10,15 +10,14 @@ image* get_image_data(pngimage *pngi, int size){
 		printf("Size is not %dx%d!\n", size, size);
 		return NULL;
 	}
-  image *i = (pixelarr*)malloc(sizeof(image));
-	i->size = size;
+  image *i = (image*)malloc(sizeof(image));
 	pixel ***data = (pixel***)malloc(sizeof(pixel**) * size);
 	for(int j = 0; j < size; j++){
 		data[j] = (pixel**)malloc(sizeof(pixel*) * size);
 	}
 	
-	for(int y = 0; y < i->height; y++) {
-		for(int x = 0; x < i->width; x++) {
+	for(int y = 0; y < pngi->height; y++) {
+		for(int x = 0; x < pngi->width; x++) {
 			data[y][x] = (pixel*)malloc(sizeof(pixel));
 			data[y][x]->r = pngi->px[0];
 			data[y][x]->g = pngi->px[1];
@@ -55,9 +54,9 @@ int count_files(char *dir){
 image* allocate_image(int size){
 	image *img = (image*)malloc(sizeof(image));
 	pixel ***data = (pixel***)malloc(sizeof(pixel**) * size);
-	for (i = 0; i < size; i++){
+	for (int i = 0; i < size; i++){
 		data[i] = (pixel**)malloc(sizeof(pixel*) * size);
-		for (j = 0; j < size; j++){
+		for (int j = 0; j < size; j++){
 		  data[i][j] = (pixel*)malloc(sizeof(pixel));
 		}
 	}
@@ -65,12 +64,12 @@ image* allocate_image(int size){
 	return img;
 }
 
-void free_image(image *img){
-  for (i = 0; i < img->size; i++){
-    for (j = 0; j < img->size; j++){
-      free(img->data[i][j])
+void free_image(image *img, int size){
+  for (int i = 0; i < size; i++){
+    for (int j = 0; j < size; j++){
+      free(img->data[i][j]);
     }
-    free(img->data[i])
+    free(img->data[i]);
   }
   free(img->data);
   free(img);
@@ -94,8 +93,8 @@ data_collection* create_data(int num_arrays, int size){
 void destroy_data( data_collection *d){
   printf("attempting to destroy data\n");
 	for(int i = 0; i < d->num_arrays; i++){
-	  free_image(data[i]);
-	  free_image(answers[i]);
+	  free_image(d->data[i], d->size);
+	  free_image(d->answers[i], d->size);
 	}
 	free(d);
 	printf("data destroyed successfully\n");
@@ -125,15 +124,15 @@ data_collection* read_data(char *data_file){
 	gcc += fread(&size, sizeof(int), 1, fp) * sizeof(int);
 	data_collection *data_c = create_data(num_arrays, size);
 	
-	for(int i = 0; i < num_arrays; ++){
+	for(int i = 0; i < num_arrays; i++){
 	  // reading pixel by pixel is sizeXsize image, sample then answer
-    for (j = 0; j < size; j++){
-      for (k = 0; k < size; k++){
+    for (int j = 0; j < size; j++){
+      for (int k = 0; k < size; k++){
         gcc += fread(data_c->data[i]->data[j][k], sizeof(*data_c->data[i]->data[j][k]), 1, fp);
       }
     }
-		for (j = 0; j < size; j++){
-      for (k = 0; k < size; k++){
+		for (int j = 0; j < size; j++){
+      for (int k = 0; k < size; k++){
         gcc += fread(data_c->answers[i]->data[j][k], sizeof(*data_c->answers[i]->data[j][k]), 1, fp);
       }
     }
@@ -169,8 +168,8 @@ void create_data_file(char *sampleDir, char *answerDir, int size, char *data_fil
 		pngimage *data = extract_from_png(data_path);
 		image *data_img = get_image_data(data, size);
 		
-    for (i = 0; i < size; i++){
-      for (j = 0; j < size; j++){
+    for (int i = 0; i < size; i++){
+      for (int j = 0; j < size; j++){
         fwrite(data_img->data[i][j], sizeof(*data_img->data[i][j]), 1, fp);
       }
     }
@@ -180,8 +179,8 @@ void create_data_file(char *sampleDir, char *answerDir, int size, char *data_fil
 		pngimage *answer = extract_from_png(answer_path);
 		image *answer_img = get_image_data(answer, size);
 		
-		 for (i = 0; i < size; i++){
-      for (j = 0; j < size; j++){
+		 for (int i = 0; i < size; i++){
+      for (int j = 0; j < size; j++){
         fwrite(answer_img->data[i][j], sizeof(*answer_img->data[i][j]), 1, fp);
       }
     }
@@ -189,8 +188,8 @@ void create_data_file(char *sampleDir, char *answerDir, int size, char *data_fil
 		/* Freeing section */
 		// XXX not freeing data or answer, dont have a free method yet for those
 		printf("attempting free in create_data_file\n");
-		free_image(answer_img);
-		free_image(data_img);
+		free_image(answer_img, size);
+		free_image(data_img, size);
 		free(data_path);
 		free(answer_path);
 		printf("free successful\n");

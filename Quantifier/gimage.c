@@ -2,7 +2,7 @@
 #include "gimage.h"
 #include <stdio.h>
 pngimage* create_image(int width, int height, pxinfo **px, png_bytep *row_pointers){
-	pngimage *i = malloc(sizeof(image));
+	pngimage *i = malloc(sizeof(pngimage));
 	i->width = width;
 	i->height = height;
 	i->px = px;
